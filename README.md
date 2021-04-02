@@ -15,3 +15,22 @@
 + 텍스트복사 브릿지 함수
    clipboardCopy(msg)
    - msg : 복사할 메시지
+-------------------------------------
+## 스크립트파일 작성 예시
+const bridge = window.welfare;
+function closeApp()
+{
+	try{
+		bridge.closeApp();
+	}catch(e){
+      console.error(e);
+   }
+}
+function toastPopup(msg)
+{
+	try{
+		bridge.toastPopup(msg);
+	}catch(e){
+      console.error(e);
+   }
+}
