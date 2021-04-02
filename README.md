@@ -17,6 +17,7 @@
    - msg : 복사할 메시지
 -------------------------------------
 ## 스크립트파일 작성 예시
+```javascript
 const bridge = window.welfare;
 function closeApp()
 {
@@ -34,3 +35,4 @@ function toastPopup(msg)
       console.error(e);
    }
 }
+```
