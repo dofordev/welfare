@@ -23,16 +23,18 @@ function closeApp()
 {
 	try{
 		bridge.closeApp();
-	}catch(e){
-      console.error(e);
-   }
+	}
+	catch(e){
+     		console.error(e);
+   	}
 }
 function toastPopup(msg)
 {
 	try{
 		bridge.toastPopup(msg);
-	}catch(e){
-      console.error(e);
-   }
+	}
+	catch(e){
+     		console.error(e);
+   	}
 }
 ```
