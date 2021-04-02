@@ -44,18 +44,18 @@ function toastPopup(msg)
 const bridge = window.welfare;
 function closeApp()
 {
-	var msg = {};
+	const params = {};
 	try {
-		window.webkit.messageHandlers.closeApp.postMessage(msg);
+		window.webkit.messageHandlers.closeApp.postMessage(params);
 	}catch(e){
 		console.error(e);
 	}
 }
 function toastPopup(msg)
 {
-	var msg = {'msg' : msg};
+	const params = {'msg' : msg};
 	try {
-		window.webkit.messageHandlers.toastPopup.postMessage(msg);
+		window.webkit.messageHandlers.toastPopup.postMessage(params);
 	}catch(e){
 		console.error(e);
 	}
