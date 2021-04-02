@@ -1,6 +1,6 @@
 # welfare
 
-[App to Web]
+> [App to Web]
 + 뒤로가기 스크립트 호출
    backKey() 호출
 
