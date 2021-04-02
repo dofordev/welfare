@@ -17,6 +17,29 @@
    - msg : 복사할 메시지
 -------------------------------------
 ## javascript 작성 예시
+### Android
+```javascript
+const bridge = window.welfare;
+function closeApp()
+{
+	try{
+		bridge.closeApp();
+	}
+	catch(e){
+     		console.error(e);
+   	}
+}
+function toastPopup(msg)
+{
+	try{
+		bridge.toastPopup(msg);
+	}
+	catch(e){
+     		console.error(e);
+   	}
+}
+```
+### IOS
 ```javascript
 const bridge = window.welfare;
 function closeApp()
