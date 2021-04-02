@@ -17,7 +17,7 @@
    - msg : 복사할 메시지
 -------------------------------------
 ## javascript 작성 예시
-### Android
+> ### Android
 ```javascript
 const bridge = window.welfare;
 function closeApp()
@@ -39,25 +39,25 @@ function toastPopup(msg)
    	}
 }
 ```
-### IOS
+> ### IOS
 ```javascript
 const bridge = window.welfare;
 function closeApp()
 {
-	try{
-		bridge.closeApp();
+	var msg = {};
+	try {
+		window.webkit.messageHandlers.closeApp.postMessage(msg);
+	}catch(e){
+		console.error(e);
 	}
-	catch(e){
-     		console.error(e);
-   	}
 }
 function toastPopup(msg)
 {
-	try{
-		bridge.toastPopup(msg);
+	var msg = {'msg' : msg};
+	try {
+		window.webkit.messageHandlers.toastPopup.postMessage(msg);
+	}catch(e){
+		console.error(e);
 	}
-	catch(e){
-     		console.error(e);
-   	}
 }
 ```
