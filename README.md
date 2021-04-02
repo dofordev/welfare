@@ -41,7 +41,6 @@ function toastPopup(msg)
 ```
 > ### IOS
 ```javascript
-const bridge = window.welfare;
 function closeApp()
 {
 	const params = {};
