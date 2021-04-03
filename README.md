@@ -19,7 +19,6 @@
 ## javascript 작성 예시
 > ### Android
 ```javascript
-const bridge = window.welfare;
 function closeApp()
 {
 	try{
