@@ -19,6 +19,7 @@
 ## javascript 작성 예시
 > ### Android
 ```javascript
+const bridge = window.welfare;
 function closeApp(){
 	try{
 		bridge.closeApp();
@@ -38,10 +39,11 @@ function toastPopup(msg){
 ```
 > ### IOS
 ```javascript
+const bridge = window.webkit.messageHandlers;
 function closeApp(){
 	const params = {};
 	try {
-		window.webkit.messageHandlers.closeApp.postMessage(params);
+		bridge.closeApp.postMessage(params);
 	}catch(e){
 		console.error(e);
 	}
@@ -49,7 +51,7 @@ function closeApp(){
 function toastPopup(msg){
 	const params = {'msg' : msg};
 	try {
-		window.webkit.messageHandlers.toastPopup.postMessage(params);
+		bridge.toastPopup.postMessage(params);
 	}catch(e){
 		console.error(e);
 	}
