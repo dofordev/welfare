@@ -1,17 +1,14 @@
 package com.skt.welfare
 
 import android.annotation.TargetApi
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 
 
 var splashView: View? = null
@@ -38,6 +35,8 @@ class MainActivity : AppCompatActivity() {
 
         mWebView.webViewClient = WebViewClient()// 클릭시 새창 안뜨게
         mWebView.addJavascriptInterface(Bridge(this), Constants.javascriptBridgeName); // 자바스크립트 브릿지 연결
+
+
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
         mWebSettings.javaScriptEnabled = true // 웹페이지 자바스클비트 허용 여부
         mWebSettings.setSupportMultipleWindows(false) // 새창 띄우기 허용 여부
@@ -51,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         mWebSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // 브라우저 캐시 허용 여부
 
+        mWebSettings.domStorageEnabled = true
 
         mWebView.run {
             webViewClient = CustomWebViewClient()
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-
+//        mWebView.post(Runnable { mWebView.loadUrl("javascript:backKey();") })
         // 뒤로가기 버튼 클릭
         if(mWebView.canGoBack()){
             mWebView.goBack()
@@ -104,25 +104,26 @@ class CustomWebViewClient : WebViewClient() {
 
     @TargetApi(Build.VERSION_CODES.M)
     override fun onReceivedError(
-        view: WebView?,
-        request: WebResourceRequest?,
-        error: WebResourceError?
+            view: WebView?,
+            request: WebResourceRequest?,
+            error: WebResourceError?
     ) {
+
         super.onReceivedError(view, request, error)
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     override fun shouldInterceptRequest(
-        view: WebView?,
-        request: WebResourceRequest?
+            view: WebView?,
+            request: WebResourceRequest?
     ): WebResourceResponse? {
         return super.shouldInterceptRequest(view, request)
     }
 
     @TargetApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(
-        view: WebView?,
-        request: WebResourceRequest?
+            view: WebView?,
+            request: WebResourceRequest?
     ): Boolean {
         return super.shouldOverrideUrlLoading(view, request)
     }
