@@ -7,22 +7,43 @@
     tools:context=".MainActivity"
     >
 
+    <LinearLayout
+        android:id="@+id/wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="100dp"
+            android:singleLine="true"
+            android:text="http" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:text="입력" />
+
+    </LinearLayout>
+
+
     <WebView
         android:id="@+id/web_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="invisible"
         tools:layout_editor_absoluteX="194dp"
         tools:layout_editor_absoluteY="239dp">
+        a
 
 
-<!--
-        <View
-            android:id="@+id/view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/skt_ci"
-            />
--->
     </WebView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

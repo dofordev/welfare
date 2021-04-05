@@ -1,18 +1,25 @@
 package com.skt.welfare
 
 import android.annotation.TargetApi
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.webkit.*
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.textfield.TextInputEditText
 
 
 var splashView: View? = null
-
+var wrap_content : View? = null
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     private var mBackWait:Long = 0
 
     private lateinit var mWebView : WebView
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 //        val mWebView : WebView = findViewById(R.id.web_view)
 
         mWebView = findViewById(R.id.web_view)
+        wrap_content = findViewById(R.id.wrap_content)
 
         mWebView.webViewClient = WebViewClient()// 클릭시 새창 안뜨게
         mWebView.addJavascriptInterface(Bridge(this), Constants.javascriptBridgeName); // 자바스크립트 브릿지 연결
@@ -47,19 +57,38 @@ class MainActivity : AppCompatActivity() {
         mWebSettings.builtInZoomControls = false // 화면 확대 축소 허용 여부
         mWebSettings.cacheMode = WebSettings.LOAD_NO_CACHE // 브라우저 캐시 허용 여부
         mWebSettings.domStorageEnabled = true // 로컬저장소 허용 여부
-
         mWebSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // 브라우저 캐시 허용 여부
-
         mWebSettings.domStorageEnabled = true
 
-        mWebView.run {
-            webViewClient = CustomWebViewClient()
-            loadUrl(Constants.baseUrl)
 
+
+        val editText : TextInputEditText= findViewById(R.id.edit_text)
+        val button : Button= findViewById(R.id.button)
+        editText.setOnKeyListener{v, keyCode, event ->
+            v.hideKeyboard()
+            if(event.action == KeyEvent.ACTION_DOWN && keyCode == KEYCODE_ENTER){
+                goMain(editText.text.toString())
+            }
+            true
+        }
+        button.setOnClickListener {
+            it.hideKeyboard()
+            goMain(editText.text.toString())
         }
 
-    }
 
+
+    }
+    fun goMain(url : String ){
+        mWebView.run {
+            webViewClient = CustomWebViewClient()
+            loadUrl(url)
+        }
+    }
+    fun View.hideKeyboard() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(windowToken, 0)
+    }
     override fun onBackPressed() {
 //        mWebView.post(Runnable { mWebView.loadUrl("javascript:backKey();") })
         // 뒤로가기 버튼 클릭
@@ -87,6 +116,8 @@ class CustomWebViewClient : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
 
+        view?.visibility = View.VISIBLE
+        wrap_content?.visibility = View.GONE
 
 //        Handler().postDelayed({
 //            splashView?.visibility = View.GONE
