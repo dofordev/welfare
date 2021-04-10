@@ -28,14 +28,13 @@ class MainActivity : AppCompatActivity() {
     private var mBackWait:Long = 0
 
     private lateinit var mWebView : WebView
-
-
+    private lateinit var context : Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
+        context = this;
 //        splashView = findViewById(R.id.view)
 
 //        val mWebView : WebView = findViewById(R.id.web_view)
@@ -45,6 +44,25 @@ class MainActivity : AppCompatActivity() {
 
         mWebView.webViewClient = WebViewClient()// 클릭시 새창 안뜨게
         mWebView.addJavascriptInterface(Bridge(this), Constants.javascriptBridgeName); // 자바스크립트 브릿지 연결
+
+        mWebView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(message: String, lineNumber: Int, sourceID: String) {
+                if(message.contains("backKey is not defined")){
+                    // 뒤로가기 버튼 클릭
+                    if(mWebView.canGoBack()){
+                        mWebView.goBack()
+                    }
+                    else if(System.currentTimeMillis() - mBackWait >=2000 ) {
+                        mBackWait = System.currentTimeMillis()
+                        Toast.makeText(context, Constants.mainCloseText, Toast.LENGTH_SHORT).show()
+                    } else {
+                        //액티비티 종료
+                        finish()
+                    }
+                }
+
+            }
+        }
 
 
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
@@ -90,19 +108,12 @@ class MainActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(windowToken, 0)
     }
     override fun onBackPressed() {
-//        mWebView.post(Runnable { mWebView.loadUrl("javascript:backKey();") })
-        // 뒤로가기 버튼 클릭
-        if(mWebView.canGoBack()){
-            mWebView.goBack()
-        }
-        else if(System.currentTimeMillis() - mBackWait >=2000 ) {
-            mBackWait = System.currentTimeMillis()
-            Toast.makeText(this, Constants.mainCloseText, Toast.LENGTH_SHORT).show()
-        } else {
-            finish() //액티비티 종료
-        }
+        mWebView.post(Runnable { mWebView.loadUrl("javascript:backKey();") })
+
 
     }
+
+
 
 }
 
@@ -133,7 +144,6 @@ class CustomWebViewClient : WebViewClient() {
         super.onLoadResource(view, url)
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
     override fun onReceivedError(
             view: WebView?,
             request: WebResourceRequest?,
@@ -143,7 +153,6 @@ class CustomWebViewClient : WebViewClient() {
         super.onReceivedError(view, request, error)
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     override fun shouldInterceptRequest(
             view: WebView?,
             request: WebResourceRequest?
@@ -151,7 +160,6 @@ class CustomWebViewClient : WebViewClient() {
         return super.shouldInterceptRequest(view, request)
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(
             view: WebView?,
             request: WebResourceRequest?
