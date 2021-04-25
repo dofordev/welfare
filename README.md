@@ -3,8 +3,6 @@
 > [App to Web]
 + 뒤로가기 스크립트
    + backKey() 호출
-+ 유심 핸드폰번호 얻기 
-   + getPhoneNumber(콜백함수명) 콜백함수(핸드폰번호) 로 리턴, 유심없을시 빈값
 
 > [Web to App]
 + 앱 종료 브릿지 함수
@@ -17,6 +15,9 @@
 + 텍스트복사 브릿지 함수
    + clipboardCopy(msg)
      - msg : 복사할 메시지
++ 유심 핸드폰번호 얻기 
+   + getPhoneNumber(callbackFnName) 
+     - callbackFnName : 콜백함수명 : 콜백함수(핸드폰번호) 로 리턴, 유심없을시 빈값
 ---
 ## javascript 작성 예시
 > ### Android
