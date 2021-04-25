@@ -78,21 +78,23 @@ class MainActivity : AppCompatActivity() {
         mWebSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // 브라우저 캐시 허용 여부
         mWebSettings.domStorageEnabled = true
 
+        goMain(Constants.baseUrl)
 
 
-        val editText : TextInputEditText= findViewById(R.id.edit_text)
-        val button : Button= findViewById(R.id.button)
-        editText.setOnKeyListener{v, keyCode, event ->
-            v.hideKeyboard()
-            if(event.action == KeyEvent.ACTION_DOWN && keyCode == KEYCODE_ENTER){
-                goMain(editText.text.toString())
-            }
-            true
-        }
-        button.setOnClickListener {
-            it.hideKeyboard()
-            goMain(editText.text.toString())
-        }
+
+//        val editText : TextInputEditText= findViewById(R.id.edit_text)
+//        val button : Button= findViewById(R.id.button)
+//        editText.setOnKeyListener{v, keyCode, event ->
+//            v.hideKeyboard()
+//            if(event.action == KeyEvent.ACTION_DOWN && keyCode == KEYCODE_ENTER){
+//                goMain(editText.text.toString())
+//            }
+//            true
+//        }
+//        button.setOnClickListener {
+//            it.hideKeyboard()
+//            goMain(editText.text.toString())
+//        }
 
 
 
@@ -123,6 +125,7 @@ class MainActivity : AppCompatActivity() {
 class CustomWebViewClient : WebViewClient() {
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
+
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
