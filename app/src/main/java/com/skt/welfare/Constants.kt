@@ -9,4 +9,7 @@ object Constants {
     val cameraPermissionText = "카메라 권한을 승인해야지만 앱을 사용할 수 있습니다."
     val storagePermissionText = "저장소 권한을 승인해야지만 앱을 사용할 수 있습니다."
     val phonePermissionText = "전화 권한을 승인해야지만 앱을 사용할 수 있습니다."
+
+    val cameraCompanyCode: Int = 1001
+    val cameraJobNo: Int = 0
 }
