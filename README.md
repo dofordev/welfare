@@ -15,6 +15,12 @@
 + 텍스트복사 브릿지 함수
    + clipboardCopy(msg)
      - msg : 복사할 메시지
++ 유심 핸드폰 가져오기 브릿지 함수
+   + getPhoneNumber(callbackFnName)
+     - callbackFnName : 리턴으로 실행될 함수명 - 인자로 핸드폰번호 넘김
++ OCR 촬영 브릿지 함수
+   + callOcrCamera(callbackFnName)
+     - callbackFnName : 리턴으로 실행될 함수명 - 인자로 서버응답 json 넘김
 ---
 ## javascript 작성 예시
 > ### Android
