@@ -8,28 +8,54 @@
     >
 
     <LinearLayout
+        android:background="@color/white"
         android:id="@+id/wrap_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:visibility="gone">
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_marginTop="128dp"
+            android:layout_width="124dp"
+            android:layout_height="137dp"
+            app:srcCompat="@drawable/ic_network_off_icon"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_text"
+        <TextView
+            android:id="@+id/textView"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="100dp"
-            android:singleLine="true"
-            android:text="http" />
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+
+            android:textSize="22dp"
+            android:textColor="@color/black"
+            android:layout_marginTop="50dp"
+            android:textStyle="bold"
+            android:text="네트워크에 접속할 수 없습니다." />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:layout_marginTop="5dp"
+            android:text="네트워크에 연결 상태를 확인해 주세요." />
 
         <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_width="160dp"
+            android:layout_height="48dp"
             android:layout_marginTop="30dp"
-            android:text="입력" />
+            android:text="재시도"
+            android:id="@+id/retry_btn"
+            android:textSize="16dp"
+            android:background="@drawable/button_round"
+            android:textColor="@color/white"
+            android:layout_gravity="center" />
 
     </LinearLayout>
 
@@ -38,10 +64,12 @@
         android:id="@+id/web_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"
+        android:visibility="gone"
         tools:layout_editor_absoluteX="194dp"
-        tools:layout_editor_absoluteY="239dp">
-        a
+        tools:layout_editor_absoluteY="239dp"
+
+        >
+
 
 
     </WebView>

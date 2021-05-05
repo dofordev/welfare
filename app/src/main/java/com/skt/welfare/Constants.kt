@@ -2,6 +2,7 @@ package com.skt.welfare
 
 object Constants {
     val baseUrl = "https://stblob2mobile.z32.web.core.windows.net"
+    val backendUrl = "https://appsvc-ehr-was.azurewebsites.net/"
     val appCloseWaitText = "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다."
     val appCloseText = "앱이 종료됩니다."
     val javascriptBridgeName = "welfare"
@@ -12,4 +13,7 @@ object Constants {
 
     val cameraCompanyCode: Int = 1001
     val cameraJobNo: Int = 0
+
+
+    val ocrImgFolder = "welfare"
 }

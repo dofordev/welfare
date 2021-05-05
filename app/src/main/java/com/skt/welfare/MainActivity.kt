@@ -6,16 +6,20 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.*
 import android.os.Bundle
-import android.util.Log
-import android.view.ContextThemeWrapper
+import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
+import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.io.File
 
 
 var splashView: View? = null
@@ -31,6 +35,7 @@ val PHONE_PERMISSION = arrayOf(Manifest.permission.READ_PHONE_STATE)
 val FLAG_PERMISSION_CAMERA = 1
 val FLAG_PERMISSION_STORAGE = 2
 val FLAG_PERMISSION_PHONE = 3
+private lateinit var context : Context
 class MainActivity : AppCompatActivity() {
 
     //뒤로가기 연속 클릭 대기 시간
@@ -38,7 +43,8 @@ class MainActivity : AppCompatActivity() {
     private var mBackWaitthird:Long = 0
 
     lateinit var mWebView : WebView
-    private lateinit var context : Context
+
+    lateinit var retryBtn : Button;
 
 
 
@@ -47,13 +53,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         context = this;
-
 //        splashView = findViewById(R.id.view)
 
 //        val mWebView : WebView = findViewById(R.id.web_view)
 
         mWebView = findViewById(R.id.web_view)
         wrap_content = findViewById(R.id.wrap_content)
+
+        retryBtn = findViewById(R.id.retry_btn)
 
         mWebView.webViewClient = WebViewClient()// 클릭시 새창 안뜨게
         mWebView.addJavascriptInterface(Bridge(this), Constants.javascriptBridgeName); // 자바스크립트 브릿지 연결
@@ -93,6 +100,7 @@ class MainActivity : AppCompatActivity() {
         mWebSettings.domStorageEnabled = true
 
 
+
         //권한체크
         val cameraPermiossion = checkPermission(CAMERA_PERMISSION, FLAG_PERMISSION_CAMERA)
         if(cameraPermiossion){
@@ -104,25 +112,24 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-//        val editText : TextInputEditText= findViewById(R.id.edit_text)
-//        val button : Button= findViewById(R.id.button)
-//        editText.setOnKeyListener{v, keyCode, event ->
-//            v.hideKeyboard()
-//            if(event.action == KeyEvent.ACTION_DOWN && keyCode == KEYCODE_ENTER){
-//                goMain(editText.text.toString())
-//            }
-//            true
-//        }
-//        button.setOnClickListener {
-//            it.hideKeyboard()
-//            goMain(editText.text.toString())
-//        }
-
-
+        //네트워크 재시도
+        retryBtn.setOnClickListener {
+            if(getNetworkConnected()){
+                val msg = handler.obtainMessage()
+                val data = Bundle()
+                data.putBoolean("network",true)
+                msg.data = data
+                handler.sendMessage(msg)
+            }
+            else{
+                Toast.makeText(context, "네트워크 연결 안됨", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     }
-    fun goMain(url : String ){
+
+
+    fun goMain(url: String){
         mWebView.run {
             webViewClient = CustomWebViewClient()
             loadUrl(url)
@@ -134,36 +141,46 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onBackPressed() {
 
-        back_cnt++
-        if(System.currentTimeMillis() - mBackWaitthird >=2000  && back_cnt > 1) {
-            back_cnt = 0
-        } else {
-            if(back_cnt >= 3){
-                Toast.makeText(context, Constants.appCloseText, Toast.LENGTH_SHORT).show()
+        if(mWebView.visibility == View.VISIBLE){
+            back_cnt++
+            if(System.currentTimeMillis() - mBackWaitthird >=2000  && back_cnt > 1) {
+                back_cnt = 0
+            } else {
+                if(back_cnt >= 3){
+                    Toast.makeText(context, Constants.appCloseText, Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
+            mBackWaitthird = System.currentTimeMillis()
+
+            mWebView.post(Runnable { mWebView.loadUrl("javascript:backKey();") })
+        }
+        else{
+            if(System.currentTimeMillis() - mBackWait >=2000 ) {
+                mBackWait = System.currentTimeMillis()
+                Toast.makeText(context, Constants.appCloseWaitText, Toast.LENGTH_SHORT).show()
+            } else {
+                //액티비티 종료
                 finish()
             }
-        }
-        mBackWaitthird = System.currentTimeMillis()
 
-        mWebView.post(Runnable { mWebView.loadUrl("javascript:backKey();") })
+        }
+
 
     }
-    
-    
+
+
     /**
      * 권한 체크
      */
-    override fun onRequestPermissionsResult(requestCode: Int
-                                            , permissions: Array<out String>
-                                            , grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             FLAG_PERMISSION_CAMERA -> {
                 for (grant in grantResults) {
                     if (grant != PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, Constants.cameraPermissionText, Toast.LENGTH_LONG).show()
                         finish()
-                    }
-                    else{
+                    } else {
                         checkPermission(STORAGE_PERMISSION, FLAG_PERMISSION_STORAGE)
                     }
                 }
@@ -173,8 +190,7 @@ class MainActivity : AppCompatActivity() {
                     if (grant != PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, Constants.storagePermissionText, Toast.LENGTH_LONG).show()
                         finish()
-                    }
-                    else{
+                    } else {
                         checkPermission(PHONE_PERMISSION, FLAG_PERMISSION_PHONE)
                     }
                 }
@@ -184,8 +200,7 @@ class MainActivity : AppCompatActivity() {
                     if (grant != PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, Constants.phonePermissionText, Toast.LENGTH_LONG).show()
                         finish()
-                    }
-                    else{
+                    } else {
                         goMain(Constants.baseUrl)
                     }
                 }
@@ -196,11 +211,20 @@ class MainActivity : AppCompatActivity() {
         for (permission in permissions) {
             if (ContextCompat.checkSelfPermission(this, permission) !=
                     PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, permissions,  flag)
+                ActivityCompat.requestPermissions(this, permissions, flag)
+                if(flag == 2) makeDir()
                 return false
             }
+
         }
         return true
+    }
+
+    fun makeDir(){
+        val filePath = Environment.getExternalStorageDirectory().absolutePath + "/" + Constants.ocrImgFolder
+        if (!File(filePath).exists()) {
+            File(filePath).mkdir()
+        }
     }
 
     /**
@@ -213,19 +237,13 @@ class MainActivity : AppCompatActivity() {
 
         override fun onLost(network: Network) {
             // 네트워크가 끊김
-            val builder = AlertDialog.Builder(ContextThemeWrapper(this@MainActivity, R.style.Theme_AppCompat_Light_Dialog))
-            builder.setTitle("")
-            builder.setMessage("네트워크 끊김")
-            builder.setCancelable(false)
-            builder.setPositiveButton("다시시도") { _, _ ->
-                if(!getNetworkConnected()){
-                    onLost(network)
-                }
-            }
-            builder.setNegativeButton("앱종료") { _, _ ->
-                finish()
-            }
-            builder.show()
+            val msg = handler.obtainMessage()
+            val data = Bundle()
+            data.putBoolean("network",false)
+            msg.data = data
+            handler.sendMessage(msg)
+
+
         }
     }
     // 콜백을 등록하는 함수
@@ -253,7 +271,7 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         terminateNetworkCallback()
     }
-
+    // 인터넷 연결 확인 함수
     fun getNetworkConnected(): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork : NetworkInfo? = cm.activeNetworkInfo
@@ -262,6 +280,29 @@ class MainActivity : AppCompatActivity() {
         return isConnected
 
     }
+
+
+
+    val handler: Handler = object : Handler() {
+        override fun handleMessage(msg: Message?) {
+
+
+            val anim = AlphaAnimation(0f, 1f);
+            anim.duration = 500
+
+            if(msg?.data!!.getBoolean("network")){
+                wrap_content?.visibility = View.GONE
+                mWebView?.visibility = View.VISIBLE
+
+            }
+            else{
+                wrap_content?.visibility = View.VISIBLE
+                mWebView?.visibility = View.GONE
+            }
+
+        }
+    }
+
 }
 
 class CustomWebViewClient : WebViewClient() {
@@ -272,15 +313,11 @@ class CustomWebViewClient : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
 
-        view?.visibility = View.VISIBLE
-        wrap_content?.visibility = View.GONE
+        Handler().postDelayed({
 
-//        Handler().postDelayed({
-//            splashView?.visibility = View.GONE
-//        },500)
-
-//        mainActivity?.setTheme(R.style.AppTheme)
-//        splashView?.visibility = View.GONE
+            view?.visibility = View.VISIBLE
+            wrap_content?.visibility = View.GONE
+        }, 500)
 
         super.onPageFinished(view, url)
     }

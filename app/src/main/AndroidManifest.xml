@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:largeHeap="true"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.Welfare">
         <activity
             android:name=".MainActivity"
