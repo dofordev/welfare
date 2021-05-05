@@ -34,7 +34,7 @@ class Bridge(private val mContext: Context){
 
     private val deviceNumberUtil by lazy { DeviceNumberUtil(mContext) }
 
-    private val webview : WebView = (mContext as MainActivity).mWebView
+    private val webview : WebView = (mContext as MainActivity).webView
     @JavascriptInterface
     fun closeApp() {
         (mContext as MainActivity).finishAffinity()

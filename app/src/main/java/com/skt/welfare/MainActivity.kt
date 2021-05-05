@@ -1,6 +1,7 @@
 package com.skt.welfare
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
@@ -36,13 +38,17 @@ val FLAG_PERMISSION_CAMERA = 1
 val FLAG_PERMISSION_STORAGE = 2
 val FLAG_PERMISSION_PHONE = 3
 private lateinit var context : Context
+private lateinit var mWebView : WebView
+
+var webviewReloadFlag = false
 class MainActivity : AppCompatActivity() {
 
     //뒤로가기 연속 클릭 대기 시간
     private var mBackWait:Long = 0
     private var mBackWaitthird:Long = 0
 
-    lateinit var mWebView : WebView
+
+    lateinit var webView : WebView;
 
     lateinit var retryBtn : Button;
 
@@ -58,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 //        val mWebView : WebView = findViewById(R.id.web_view)
 
         mWebView = findViewById(R.id.web_view)
+        webView = findViewById(R.id.web_view)
         wrap_content = findViewById(R.id.wrap_content)
 
         retryBtn = findViewById(R.id.retry_btn)
@@ -271,40 +278,48 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         terminateNetworkCallback()
     }
-    // 인터넷 연결 확인 함수
-    fun getNetworkConnected(): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork : NetworkInfo? = cm.activeNetworkInfo
-        val isConnected : Boolean = activeNetwork?.isConnectedOrConnecting == true
-
-        return isConnected
-
-    }
 
 
 
-    val handler: Handler = object : Handler() {
-        override fun handleMessage(msg: Message?) {
 
 
-            val anim = AlphaAnimation(0f, 1f);
-            anim.duration = 500
 
-            if(msg?.data!!.getBoolean("network")){
-                wrap_content?.visibility = View.GONE
-                mWebView?.visibility = View.VISIBLE
+}
+// 인터넷 연결 확인 함수
+fun getNetworkConnected(): Boolean {
+    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val activeNetwork : NetworkInfo? = cm.activeNetworkInfo
+    val isConnected : Boolean = activeNetwork?.isConnectedOrConnecting == true
 
-            }
-            else{
-                wrap_content?.visibility = View.VISIBLE
-                mWebView?.visibility = View.GONE
-            }
-
-        }
-    }
+    return isConnected
 
 }
 
+val handler: Handler = object : Handler() {
+    @SuppressLint("HandlerLeak")
+    override fun handleMessage(msg: Message?) {
+
+
+        val anim = AlphaAnimation(0f, 1f);
+        anim.duration = 500
+
+        if(msg?.data!!.getBoolean("network")){
+            wrap_content?.visibility = View.GONE
+            mWebView?.visibility = View.VISIBLE
+            if(webviewReloadFlag){
+                mWebView?.reload()
+                webviewReloadFlag = false
+            }
+
+        }
+        else{
+            webviewReloadFlag = true
+            wrap_content?.visibility = View.VISIBLE
+            mWebView?.visibility = View.GONE
+        }
+
+    }
+}
 class CustomWebViewClient : WebViewClient() {
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
@@ -313,16 +328,32 @@ class CustomWebViewClient : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
 
-        Handler().postDelayed({
+        Log.d(TAG, "onPageFinished")
+        if(getNetworkConnected()){
+            Handler().postDelayed({
 
-            view?.visibility = View.VISIBLE
-            wrap_content?.visibility = View.GONE
-        }, 500)
+                val msg = handler.obtainMessage()
+                val data = Bundle()
+                data.putBoolean("network",true)
+                msg.data = data
+                handler.sendMessage(msg)
+
+            }, 500)
+        }
+        else{
+            val msg = handler.obtainMessage()
+            val data = Bundle()
+            data.putBoolean("network",false)
+            msg.data = data
+            handler.sendMessage(msg)
+        }
+
 
         super.onPageFinished(view, url)
     }
 
     override fun onLoadResource(view: WebView?, url: String?) {
+        Log.d(TAG, "onLoadResource")
         super.onLoadResource(view, url)
     }
 
@@ -331,7 +362,6 @@ class CustomWebViewClient : WebViewClient() {
             request: WebResourceRequest?,
             error: WebResourceError?
     ) {
-
         super.onReceivedError(view, request, error)
     }
 
@@ -346,6 +376,8 @@ class CustomWebViewClient : WebViewClient() {
             view: WebView?,
             request: WebResourceRequest?
     ): Boolean {
+
+        Log.d(TAG, "shouldOverrideUrlLoading")
         return super.shouldOverrideUrlLoading(view, request)
     }
 }
