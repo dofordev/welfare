@@ -134,8 +134,16 @@ class OcrCallback(callbackFnName : String, webview : WebView) : TakePictureCallb
 
                 override fun onFailure(call: Call<OcrResponse>, t: Throwable) {
                     Log.e(TAG, t.stackTraceToString())
+
+                    val res = OcrResponse(
+                        resultMsg ="알수없는에러. 담당자에게 문의하세요",
+                        resultCd = 999,
+                        resultMsgTyp = "warning",
+                        data = null
+                    )
+
                     // 실패
-                    webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}('');") })
+                    webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(res)});") })
                 }
             })
 
