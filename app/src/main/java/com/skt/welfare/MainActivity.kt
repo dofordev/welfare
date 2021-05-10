@@ -231,10 +231,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun makeDir(){
-        val filePath = Environment.getExternalStorageDirectory().absolutePath + "/" + Constants.ocrImgFolder
-        if (!File(filePath).exists()) {
-            File(filePath).mkdir()
-        }
+//        val filePath = Environment.getExternalStorageDirectory().absolutePath + "/" + Constants.ocrImgFolder
+//        if (!File(filePath).exists()) {
+//            File(filePath).mkdir()
+//        }
     }
 
     /**

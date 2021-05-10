@@ -88,15 +88,16 @@ class Bridge(private val mContext: Context){
         EzdocuSDK.open((mContext as MainActivity), Constants.cameraCompanyCode, Constants.cameraJobNo)
         val option = TakePictureOption.CreateInsure43()
         option.retry = 1
-        EzdocuSDK.takePicture(option, OcrCallback(callbackFnName, webview))
+        EzdocuSDK.takePicture(option, OcrCallback(callbackFnName, mContext))
     }
 
 
 }
 
-class OcrCallback(callbackFnName : String, webview : WebView) : TakePictureCallback {
-    val webview = webview
+class OcrCallback(callbackFnName : String, context : Context) : TakePictureCallback {
+    val webview = (context as MainActivity).webView
     val callbackFnName = callbackFnName
+    val context = context
     override fun onComplete(executeResult: ExecuteResult?) {
         val lensPosResult = executeResult?.lensPosResult
         val polyImgResult = executeResult?.polyImgResult
@@ -107,15 +108,16 @@ class OcrCallback(callbackFnName : String, webview : WebView) : TakePictureCallb
 
 
         try {
-            val filePath = Environment.getExternalStorageDirectory().absolutePath + "/" + Constants.ocrImgFolder
 
             val timeStamp: String = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
             val fileName = "ocr_${timeStamp}.png"
-            val file: File = File(filePath, fileName)
+            val file: File = File(context.filesDir , fileName)
             val fOut = FileOutputStream(file)
-            bitmap?.compress(Bitmap.CompressFormat.PNG, 100, fOut)
+
+            bitmap?.compress(Bitmap.CompressFormat.PNG, 100 , fOut)
             fOut.flush()
             fOut.close()
+
 
 
             val requestFile: RequestBody =
@@ -127,7 +129,6 @@ class OcrCallback(callbackFnName : String, webview : WebView) : TakePictureCallb
                     call: Call<OcrResponse>,
                     response: Response<OcrResponse>
                 ) {
-                    Log.e(TAG, response?.body().toString())
                     // 성공
                     webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(response?.body())});") })
                 }
