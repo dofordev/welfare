@@ -92,6 +92,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        if(BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true);
+
+
 
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
         mWebSettings.javaScriptEnabled = true // 웹페이지 자바스클비트 허용 여부
