@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.os.Environment
 import android.util.Log
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
 import android.webkit.WebView
 import android.widget.Toast
 import com.ezdocu.sdk.camera.*
@@ -114,37 +115,35 @@ class OcrCallback(callbackFnName : String, context : Context) : TakePictureCallb
             val fileName = "ocr_${timeStamp}.png"
 
 
-
             val out = ByteArrayOutputStream()
 
-
-            bitmap?.compress(Bitmap.CompressFormat.PNG, 100 , out)
+            bitmap?.compress(Bitmap.CompressFormat.PNG, 50 , out)
             out.flush()
             out.close()
-
-
 
             val requestFile: RequestBody =
                 RequestBody.create(MediaType.parse("image/*"), out.toByteArray())
             val body = MultipartBody.Part.createFormData("mstFile", fileName, requestFile)
+
+
             val api = OcrApi.create()
             api.postOcrImage(body).enqueue(object : Callback<OcrResponse> {
                 override fun onResponse(
                     call: Call<OcrResponse>,
                     response: Response<OcrResponse>
                 ) {
+
                     // 성공
-                    webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(response?.body())});") })
+                    webview.post(Runnable { webview.evaluateJavascript("${callbackFnName}(${Gson().toJson(response?.body())});", ValueCallback(){}) })
                 }
 
                 override fun onFailure(call: Call<OcrResponse>, t: Throwable) {
                     Log.e(TAG, t.stackTraceToString())
 
-                    context.deleteFile(fileName)
                     val res = OcrResponse(
-                        resultMsg ="알수없는에러. 담당자에게 문의하세요",
-                        resultCd = 999,
-                        resultMsgTyp = "warning",
+                        resultMsg ="응답 없음",
+                        resultCd = 888,
+                        resultMsgTyp = "E",
                         data = null
                     )
 
@@ -155,7 +154,15 @@ class OcrCallback(callbackFnName : String, context : Context) : TakePictureCallb
 
         } catch (e: Exception) {
             Log.e(TAG, e.stackTraceToString())
-            webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}('');") })
+            val res = OcrResponse(
+                resultMsg ="알수 없는 에러",
+                resultCd = 999,
+                resultMsgTyp = "E",
+                data = null
+            )
+
+            // 실패
+            webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(res)});") })
         }
 
     }

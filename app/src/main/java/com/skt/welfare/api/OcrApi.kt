@@ -9,8 +9,7 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
-
-
+import java.util.concurrent.TimeUnit
 
 
 interface OcrApi {
@@ -35,6 +34,7 @@ interface OcrApi {
             }
 
             val client = OkHttpClient.Builder()
+                .readTimeout(20, TimeUnit.SECONDS)
                 .addInterceptor(headerInterceptor)
                 .addInterceptor(httpLoggingInterceptor)
                 .build()

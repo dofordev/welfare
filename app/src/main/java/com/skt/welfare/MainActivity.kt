@@ -356,7 +356,6 @@ class CustomWebViewClient : WebViewClient() {
     }
 
     override fun onLoadResource(view: WebView?, url: String?) {
-        Log.d(TAG, "onLoadResource")
         super.onLoadResource(view, url)
     }
 
@@ -380,7 +379,6 @@ class CustomWebViewClient : WebViewClient() {
             request: WebResourceRequest?
     ): Boolean {
 
-        Log.d(TAG, "shouldOverrideUrlLoading")
         return super.shouldOverrideUrlLoading(view, request)
     }
 }
