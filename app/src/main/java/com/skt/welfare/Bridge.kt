@@ -112,12 +112,12 @@ class OcrCallback(callbackFnName : String, context : Context) : TakePictureCallb
         try {
 
             val timeStamp: String = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
-            val fileName = "ocr_${timeStamp}.png"
+            val fileName = "ocr_${timeStamp}.jpeg"
 
 
             val out = ByteArrayOutputStream()
 
-            bitmap?.compress(Bitmap.CompressFormat.PNG, 50 , out)
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 50 , out)
             out.flush()
             out.close()
 
