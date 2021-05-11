@@ -22,6 +22,7 @@ import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -111,18 +112,21 @@ class OcrCallback(callbackFnName : String, context : Context) : TakePictureCallb
 
             val timeStamp: String = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
             val fileName = "ocr_${timeStamp}.png"
-            val file: File = File(context.filesDir , fileName)
-            val fOut = FileOutputStream(file)
 
-            bitmap?.compress(Bitmap.CompressFormat.PNG, 100 , fOut)
-            fOut.flush()
-            fOut.close()
+
+
+            val out = ByteArrayOutputStream()
+
+
+            bitmap?.compress(Bitmap.CompressFormat.PNG, 100 , out)
+            out.flush()
+            out.close()
 
 
 
             val requestFile: RequestBody =
-                RequestBody.create(MediaType.parse("image/*"), file)
-            val body = MultipartBody.Part.createFormData("mstFile", file.getName(), requestFile)
+                RequestBody.create(MediaType.parse("image/*"), out.toByteArray())
+            val body = MultipartBody.Part.createFormData("mstFile", fileName, requestFile)
             val api = OcrApi.create()
             api.postOcrImage(body).enqueue(object : Callback<OcrResponse> {
                 override fun onResponse(
@@ -136,6 +140,7 @@ class OcrCallback(callbackFnName : String, context : Context) : TakePictureCallb
                 override fun onFailure(call: Call<OcrResponse>, t: Throwable) {
                     Log.e(TAG, t.stackTraceToString())
 
+                    context.deleteFile(fileName)
                     val res = OcrResponse(
                         resultMsg ="알수없는에러. 담당자에게 문의하세요",
                         resultCd = 999,
