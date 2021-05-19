@@ -14,6 +14,12 @@ object Constants {
     val cameraCompanyCode: Int = 1001
     val cameraJobNo: Int = 0
 
-
     val ocrImgFolder = "welfare"
+
+    val toktokDevUrl = "https://devgmp.sktelecom:9443/service.pe?"
+    val toktokPrdUrl = "https://m.toktok.sk.com:9443/service.pe?"
+
+    val toktokPhonePackageName = "com.skt.pe.provider"
+    val toktokTabletPackageName = "com.skt.tablet.group.login"
+
 }

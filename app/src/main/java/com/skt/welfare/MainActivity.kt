@@ -2,26 +2,29 @@ package com.skt.welfare
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.*
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Message
+import android.os.*
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.HashMap
 
 
 var splashView: View? = null
@@ -41,6 +44,14 @@ private lateinit var context : Context
 private lateinit var mWebView : WebView
 
 var webviewReloadFlag = false
+
+
+var filePathCallbackLollipop: ValueCallback<Array<Uri>>? = null
+const val FILECHOOSER_REQ_CODE = 2002
+private var cameraImageUri: Uri? = null
+
+
+
 class MainActivity : AppCompatActivity() {
 
     //뒤로가기 연속 클릭 대기 시간
@@ -90,6 +101,22 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }
+
+
+            override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>?, fileChooserParams: FileChooserParams): Boolean {
+
+                // Callback 초기화
+                if (filePathCallbackLollipop != null) {
+                    filePathCallbackLollipop?.onReceiveValue(null)
+                    filePathCallbackLollipop = null
+                }
+                filePathCallbackLollipop = filePathCallback
+
+                getFiles(fileChooserParams.isCaptureEnabled,1, fileChooserParams)
+                return true
+
+            }
+
         }
 
         if(BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true);
@@ -140,6 +167,9 @@ class MainActivity : AppCompatActivity() {
 
 
     fun goMain(url: String){
+        //톡톡로그인 체크
+
+
         mWebView.run {
             webViewClient = CustomWebViewClient()
             loadUrl(url)
@@ -283,11 +313,100 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun getFiles(_isCapture: Boolean, selectedType: Int, fileChooserParams: WebChromeClient.FileChooserParams) {
+        val intentCamera = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        val path = getFilesDir()
+        val timeStamp = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+        val fileName = "welfare_camera_${timeStamp}.png"
+        val file = File(path, fileName)
+        cameraImageUri = Uri.fromFile(file)
+        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
+        if (!_isCapture) {
+            val pickIntent = Intent(Intent.ACTION_PICK)
+            pickIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, fileChooserParams.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE)
+
+            if (selectedType == 1) {
+                pickIntent.type = MediaStore.Images.Media.CONTENT_TYPE
+                pickIntent.data = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            } else if (selectedType == 2) {
+                pickIntent.type = MediaStore.Video.Media.CONTENT_TYPE
+                pickIntent.data = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            }
+            val pickTitle = ""
+            val chooserIntent = Intent.createChooser(pickIntent, pickTitle)
 
 
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf<Parcelable>(intentCamera))
+            startActivityForResult(context as Activity, chooserIntent, FILECHOOSER_REQ_CODE, null)
+        } else {
+            startActivityForResult(context as Activity, intentCamera, FILECHOOSER_REQ_CODE, null)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        var data = data
+        when (requestCode) {
+
+            FILECHOOSER_REQ_CODE -> if (resultCode == RESULT_OK) {
+                if (filePathCallbackLollipop == null) return
+                if (data == null) data = Intent()
+                if (data.data == null) data.data = cameraImageUri
+
+                if(data.clipData != null){
+                    val count = data.clipData?.itemCount!!
+                    val uris = Array<Uri>(count){
+                        data.clipData?.getItemAt(it)?.uri!!
+                    }
+                    filePathCallbackLollipop!!.onReceiveValue(uris)
+                }
+                else{
+                    filePathCallbackLollipop!!.onReceiveValue(
+                        WebChromeClient.FileChooserParams.parseResult(
+                            resultCode,
+                            data
+                        )
+                    )
+                }
+
+                filePathCallbackLollipop = null
+            } else {
+                if (filePathCallbackLollipop != null) {
+                    filePathCallbackLollipop!!.onReceiveValue(null)
+                    filePathCallbackLollipop = null
+                }
+
+            }
+            else -> {
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
 
 
 }
+
+//toktok 체크
+fun checkInstallationOf(context : Context, packagename : String) : Boolean{
+    val pm = context.packageManager
+
+    return try{
+        pm.getPackageInfo(packagename, PackageManager.GET_META_DATA)
+        true
+    }
+    catch(e : PackageManager.NameNotFoundException){
+        false
+    }
+}
+
+//toktok 연동파라미터 구하기
+fun getAuthKeyCompanyCDEncPwdMDN(context : Context) : Map<String, String>{
+    var map  = HashMap<String, String>()
+
+    return map
+}
+
+
 // 인터넷 연결 확인 함수
 fun getNetworkConnected(): Boolean {
     val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -323,6 +442,7 @@ val handler: Handler = object : Handler() {
 
     }
 }
+
 class CustomWebViewClient : WebViewClient() {
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
