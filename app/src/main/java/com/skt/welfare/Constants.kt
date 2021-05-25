@@ -16,10 +16,20 @@ object Constants {
 
     val ocrImgFolder = "welfare"
 
-    val toktokDevUrl = "https://devgmp.sktelecom:9443/service.pe?"
-    val toktokPrdUrl = "https://m.toktok.sk.com:9443/service.pe?"
+    val toktokAppId = "Z000ST0057"
+    val toktokDevUrl = "https://devgmp.sktelecom.com:9443"
+    val toktokPrdUrl = "https://m.toktok.sk.com:9443"
 
+    val toktokStorePhonePackageName = "com.skt.pe.activity.mobileclient"
     val toktokPhonePackageName = "com.skt.pe.provider"
+    val toktokStoreTabletPackageName = "com.sk.tablet.group.store"
     val toktokTabletPackageName = "com.skt.tablet.group.login"
+
+    val toktokPhoneActionName = "com.sk.pe.group.auth.GMP_LOGIN"
+    val toktokTabletActionName = "com.sk.pe.auth.GMP_LOGIN"
+
+    val storeUrl = "https://m.toktok.sk.com/fordev.jsp"
+
+    var phoneNumber = ""
 
 }

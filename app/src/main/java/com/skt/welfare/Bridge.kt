@@ -1,20 +1,19 @@
 package com.skt.welfare
 
-import DeviceNumberUtil
-import android.R.attr.path
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Environment
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebView
 import android.widget.Toast
-import com.ezdocu.sdk.camera.*
+import com.ezdocu.sdk.camera.ExecuteResult
+import com.ezdocu.sdk.camera.EzdocuSDK
+import com.ezdocu.sdk.camera.TakePictureCallback
+import com.ezdocu.sdk.camera.TakePictureOption
 import com.google.gson.Gson
-import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.skt.welfare.api.OcrApi
 import com.skt.welfare.api.OcrResponse
 import okhttp3.MediaType
@@ -24,8 +23,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,7 +31,6 @@ private const val TAG = "Bridge"
 
 class Bridge(private val mContext: Context){
 
-    private val deviceNumberUtil by lazy { DeviceNumberUtil(mContext) }
 
     private val webview : WebView = (mContext as MainActivity).webView
     @JavascriptInterface
@@ -58,32 +54,9 @@ class Bridge(private val mContext: Context){
 
     @JavascriptInterface
     fun getPhoneNumber(callbackFnName: String) {
-        if(deviceNumberUtil.enabledUSIM()){
-            var phoneNumber = ""
-            Log.d(TAG, "toNationalPhoneNumber" + deviceNumberUtil.getSubInfoList()?.size)
-            val phoneNumbers = deviceNumberUtil.getPhoneNumberList(deviceNumberUtil.getSubInfoList()).map {
-                phoneNumber = it.toNationalPhoneNumber()
-            }
-            if(phoneNumbers.isNotEmpty()) {
-                webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}('${phoneNumber}');") })
-            } else {
-                webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}('');") })
-            }
-        }
-        else{
-            webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}('');") })
-        }
+        webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}('${Constants.phoneNumber}');") })
+    }
 
-    }
-    fun String.toNationalPhoneNumber(): String {
-        val phoneNumberUtil = PhoneNumberUtil.getInstance()
-        val locale = Locale.getDefault().country
-        val toNationalNum = phoneNumberUtil.parse(this, locale)
-        return phoneNumberUtil.format(
-                toNationalNum,
-                PhoneNumberUtil.PhoneNumberFormat.NATIONAL
-        )
-    }
 
     @JavascriptInterface
     fun callOcrCamera(callbackFnName: String) {
