@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        /*
+
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
         var toktokPackagename = if(isTablet(context)) Constants.toktokTabletPackageName else Constants.toktokPhonePackageName
         val i = Intent(Intent.ACTION_VIEW)
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-         */
+
 
 
         mWebView = findViewById(R.id.web_view)
