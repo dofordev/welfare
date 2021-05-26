@@ -23,8 +23,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
-import com.google.gson.Gson
-import com.skt.welfare.api.OcrResponse
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
 import retrofit2.Call
@@ -97,12 +95,12 @@ class MainActivity : AppCompatActivity() {
         //스토어 설치 체크
         if(!checkInstallationOf(context, storePackagename)) {
             startActivity(i)
-            finishAffinity()
+            finish()
         }
         //톡톡 설치 체크
         else if(!checkInstallationOf(context, toktokPackagename)) {
             startActivity(i)
-            finishAffinity()
+            finish()
         }
         else{
 
@@ -427,13 +425,14 @@ class MainActivity : AppCompatActivity() {
                                     }
                                     "3601","3602","3603" -> {
                                         Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                        finishAffinity()
+                                        finish()
                                     }
                                     "7002","7010","7003","7006","7011","7012" -> {
                                         Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
                                         val intent = Intent(Intent.ACTION_VIEW)
                                         intent.data = Uri.parse(Constants.storeUrl)
                                         startActivity(intent)
+                                        finish()
                                     }
                                     "3205" -> {//인증앱업데이트
                                         val installUrl = if(isTablet(context)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.toktokAppId}"
@@ -441,11 +440,11 @@ class MainActivity : AppCompatActivity() {
                                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
                                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_NO_HISTORY
                                         startActivity(intent)
-                                        finishAffinity()
+                                        finish()
                                     }
                                     else -> {
                                         Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                        finishAffinity()
+                                        finish()
                                     }
                                 }
                             }
@@ -453,7 +452,7 @@ class MainActivity : AppCompatActivity() {
                         override fun onFailure(call: Call<TokTokResponse>, t: Throwable) {
                             Log.e(TAG, t.stackTraceToString())
                             Toast.makeText(context, t.stackTraceToString(), Toast.LENGTH_SHORT).show()
-                            finishAffinity()
+                            finish()
                         }
                 })
 

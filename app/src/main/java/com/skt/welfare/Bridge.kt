@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Bitmap
+import android.provider.Settings
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
@@ -25,6 +26,7 @@ import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.system.exitProcess
 
 
 private const val TAG = "Bridge"
@@ -36,6 +38,7 @@ class Bridge(private val mContext: Context){
     @JavascriptInterface
     fun closeApp() {
         (mContext as MainActivity).finishAffinity()
+        exitProcess(0)
     }
 
 
