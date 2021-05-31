@@ -52,7 +52,10 @@ interface TokTokApi {
                 .build()
 
             var url = Constants.toktokPrdUrl;
-            if(BuildConfig.FLAVOR.equals("dev")) url = Constants.toktokDevUrl
+            if(BuildConfig.FLAVOR.equals("dev")){
+                url = Constants.toktokDevUrl
+            }
+
             return Retrofit.Builder()
                 .baseUrl(url)
                 .client(client)

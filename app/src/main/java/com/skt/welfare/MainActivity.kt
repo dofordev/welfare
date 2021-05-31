@@ -30,6 +30,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 import java.net.NetworkInterface
+import java.net.URLDecoder
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -60,6 +61,8 @@ const val FILECHOOSER_REQ_CODE = 2002
 const val TOKTOK_REQ_CODE = 1007
 private var cameraImageUri: Uri? = null
 
+private var authFlag = false
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -87,7 +90,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
         var toktokPackagename = if(isTablet(context)) Constants.toktokTabletPackageName else Constants.toktokPhonePackageName
         val i = Intent(Intent.ACTION_VIEW)
@@ -102,14 +104,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(i)
             finish()
         }
-        else{
 
-            var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
-            val intent = Intent(actionName)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivityForResult(intent, TOKTOK_REQ_CODE)
-
-        }
 
 
 
@@ -211,10 +206,20 @@ class MainActivity : AppCompatActivity() {
 
     fun goMain(url: String){
 
-        mWebView.run {
-            webViewClient = CustomWebViewClient()
-            loadUrl(url)
+
+        if(!authFlag){
+            var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
+            val intent = Intent(actionName)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivityForResult(intent, TOKTOK_REQ_CODE)
         }
+        else{
+            mWebView.run {
+                webViewClient = CustomWebViewClient()
+                loadUrl(url)
+            }
+        }
+
     }
     fun View.hideKeyboard() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -393,7 +398,7 @@ class MainActivity : AppCompatActivity() {
             TOKTOK_REQ_CODE -> if (resultCode == RESULT_OK) {
                 val map = getAuthKeyCompanyCDEncPwdMDN(context)
                 val companyCd = map?.get("COMPANY_CD")
-                val encPwd = map?.get("ENC_PWD")
+                val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
                 val osName = "Android"
                 val groupCd = "SK"
                 val osVersion = android.os.Build.VERSION.SDK_INT
@@ -405,7 +410,7 @@ class MainActivity : AppCompatActivity() {
 
 
                 val api = TokTokApi.create()
-                api.auth("COMMON_COMMON_EMPINFO",companyCd,encPwd,osName,groupCd,appVer,authKey,mdn,appId,osVersion,lang).enqueue(object :
+                api.auth("COMMON_COMMON_EMPINFO",companyCd,appId, appVer, encPwd, osName,groupCd,lang,authKey,osVersion, mdn).enqueue(object :
                     Callback<TokTokResponse> {
                         override fun onResponse(
                             call: Call<TokTokResponse>,
@@ -414,7 +419,11 @@ class MainActivity : AppCompatActivity() {
                             val email = response.body()?.email
                             val result = response.body()?.result
                             val resultMessage = response.body()?.resultMessage
-                            if(!result.equals("1000")){
+                            if(result.equals("1000")){
+                                authFlag = true
+                                goMain(Constants.baseUrl)
+                            }
+                            else{
                                 when(result){
                                     "7000","7001","7005","7008","7009","7015" -> {
                                         var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
