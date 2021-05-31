@@ -21,6 +21,9 @@
 + OCR 촬영 브릿지 함수
    + callOcrCamera(callbackFnName)
      - callbackFnName : 리턴으로 실행될 함수명 - 인자로 서버응답 json 넘김
++ 톡톡로그인 정보 가져오기 브릿지 함수
+   + getLoginInfo(callbackFnName)
+     - callbackFnName : 리턴으로 실행될 함수명 - 인자로 로그인응답 json 넘김
 ---
 ## javascript 작성 예시
 > ### Android
