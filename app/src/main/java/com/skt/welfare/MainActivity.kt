@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
+import com.google.gson.Gson
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
 import retrofit2.Call
@@ -86,6 +87,8 @@ class MainActivity : AppCompatActivity() {
 //        splashView = findViewById(R.id.view)
 
 //        val mWebView : WebView = findViewById(R.id.web_view)
+
+
 
 
 
@@ -417,6 +420,10 @@ class MainActivity : AppCompatActivity() {
                             call: Call<TokTokResponse>,
                             response: Response<TokTokResponse>
                         ) {
+
+                            Constants.loginInfo = response.body()
+
+
                             val email = response.body()?.email
                             val result = response.body()?.result
                             val resultMessage = response.body()?.resultMessage

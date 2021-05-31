@@ -1,5 +1,7 @@
 package com.skt.welfare
 
+import com.skt.welfare.api.TokTokResponse
+
 object Constants {
     val baseUrl = "https://stblob2mobile.z32.web.core.windows.net"
     val backendUrl = "https://appsvc-ehr-was.azurewebsites.net/"
@@ -32,4 +34,5 @@ object Constants {
 
     var phoneNumber = ""
 
+    var loginInfo: TokTokResponse? = null
 }

@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Bitmap
-import android.provider.Settings
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
@@ -58,6 +57,11 @@ class Bridge(private val mContext: Context){
     @JavascriptInterface
     fun getPhoneNumber(callbackFnName: String) {
         webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}('${Constants.phoneNumber}');") })
+    }
+
+    @JavascriptInterface
+    fun getLoginInfo(callbackFnName: String) {
+        webview.post(Runnable { webview.evaluateJavascript("javascript:${callbackFnName}(${Gson().toJson(Constants.loginInfo)});", ValueCallback(){}) })
     }
 
 
