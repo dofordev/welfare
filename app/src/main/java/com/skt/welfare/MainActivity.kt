@@ -89,6 +89,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+        authFlag = false
 
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
         var toktokPackagename = if(isTablet(context)) Constants.toktokTabletPackageName else Constants.toktokPhonePackageName
