@@ -3,7 +3,8 @@ package com.skt.welfare
 import com.skt.welfare.api.TokTokResponse
 
 object Constants {
-    val baseUrl = "https://appsvcmobilefront.z32.web.core.windows.net/"
+//    val baseUrl = "https://appsvcmobilefront.z32.web.core.windows.net/"
+    val baseUrl = "https://appsvc-ehr-mobile-front.azurewebsites.net/"
     val backendUrl = "https://appsvc-ehr-was.azurewebsites.net/"
     val appCloseWaitText = "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다."
     val appCloseText = "앱이 종료됩니다."
