@@ -35,5 +35,7 @@ object Constants {
 
     var phoneNumber = ""
 
+    var token = ""
+
     var loginInfo: TokTokResponse? = null
 }

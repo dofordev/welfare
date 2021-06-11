@@ -66,7 +66,8 @@ class Bridge(private val mContext: Context){
 
 
     @JavascriptInterface
-    fun callOcrCamera(callbackFnName: String) {
+    fun callOcrCamera(callbackFnName: String, token: String) {
+        Constants.token = token
         EzdocuSDK.open((mContext as MainActivity), Constants.cameraCompanyCode, Constants.cameraJobNo)
         val option = TakePictureOption.CreateInsure43()
         option.retry = 1
