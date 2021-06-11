@@ -19,8 +19,9 @@
    + getPhoneNumber(callbackFnName)
      - callbackFnName : 리턴으로 실행될 함수명 - 인자로 핸드폰번호 넘김
 + OCR 촬영 브릿지 함수
-   + callOcrCamera(callbackFnName)
+   + callOcrCamera(callbackFnName, token)
      - callbackFnName : 리턴으로 실행될 함수명 - 인자로 서버응답 json 넘김
+     - token : 앱 -> 백엔드 통신시 헤더에 세팅할 토큰값
 + 톡톡로그인 정보 가져오기 브릿지 함수
    + getLoginInfo(callbackFnName)
      - callbackFnName : 리턴으로 실행될 함수명 - 인자로 로그인응답 json 넘김
