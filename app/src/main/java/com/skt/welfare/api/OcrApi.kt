@@ -29,6 +29,8 @@ interface OcrApi {
             val headerInterceptor = Interceptor {
                 val request = it.request()
                     .newBuilder()
+                    .addHeader("withCredentials", "true")
+                    .addHeader("Authorization", "Bearer ${Constants.token}")
                     .build()
                 return@Interceptor it.proceed(request)
             }
