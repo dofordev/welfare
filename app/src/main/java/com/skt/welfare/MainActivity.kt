@@ -60,6 +60,7 @@ var webviewReloadFlag = false
 var filePathCallbackLollipop: ValueCallback<Array<Uri>>? = null
 const val FILECHOOSER_REQ_CODE = 2002
 const val TOKTOK_REQ_CODE = 1007
+const val IMAGE_REQ_CODE = 1000
 private var cameraImageUri: Uri? = null
 
 private var authFlag = false
@@ -87,8 +88,6 @@ class MainActivity : AppCompatActivity() {
 //        splashView = findViewById(R.id.view)
 
 //        val mWebView : WebView = findViewById(R.id.web_view)
-
-
 
 
 
@@ -473,6 +472,9 @@ class MainActivity : AppCompatActivity() {
                             finish()
                         }
                 })
+
+            }
+            IMAGE_REQ_CODE -> if (resultCode == RESULT_OK) {
 
             }
             FILECHOOSER_REQ_CODE -> if (resultCode == RESULT_OK) {

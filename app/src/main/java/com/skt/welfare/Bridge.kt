@@ -3,6 +3,7 @@ package com.skt.welfare
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
 import android.webkit.JavascriptInterface
@@ -14,7 +15,9 @@ import com.ezdocu.sdk.camera.EzdocuSDK
 import com.ezdocu.sdk.camera.TakePictureCallback
 import com.ezdocu.sdk.camera.TakePictureOption
 import com.google.gson.Gson
-import com.skt.welfare.api.OcrApi
+import com.skt.welfare.api.BackendApi
+import com.skt.welfare.api.ImageRequest
+import com.skt.welfare.api.ImageResponse
 import com.skt.welfare.api.OcrResponse
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -73,7 +76,18 @@ class Bridge(private val mContext: Context){
         option.retry = 1
         EzdocuSDK.takePicture(option, OcrCallback(callbackFnName, mContext))
     }
+    @JavascriptInterface
+    fun imageViewer(token: String, fileName: String, filePath: String) {
+        Constants.token = token
 
+        val intent = Intent((mContext as MainActivity), ImageActivity::class.java)
+        intent.putExtra("fileName", fileName)
+        intent.putExtra("filePath", filePath)
+
+        (mContext as MainActivity).startActivityForResult(intent, IMAGE_REQ_CODE)
+
+
+    }
 
 }
 
@@ -107,7 +121,7 @@ class OcrCallback(callbackFnName : String, context : Context) : TakePictureCallb
             val body = MultipartBody.Part.createFormData("mstFile", fileName, requestFile)
 
 
-            val api = OcrApi.create()
+            val api = BackendApi.create()
             api.postOcrImage(body).enqueue(object : Callback<OcrResponse> {
                 override fun onResponse(
                     call: Call<OcrResponse>,
