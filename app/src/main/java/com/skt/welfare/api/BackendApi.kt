@@ -12,7 +12,7 @@ import retrofit2.http.*
 import java.util.concurrent.TimeUnit
 
 
-interface OcrApi {
+interface BackendApi {
 
     @Multipart
     @POST("api/bsns/mdcl/user/reqOcrFileRgcn")
@@ -20,9 +20,14 @@ interface OcrApi {
         @Part image: MultipartBody.Part
     ): Call<OcrResponse>
 
+    @POST("api/adm/getEncodedImage")
+    fun postImage(
+        @Body params: ImageRequest
+    ): Call<ImageResponse>
+
     companion object {
 
-        fun create(): OcrApi {
+        fun create(): BackendApi {
             val httpLoggingInterceptor = HttpLoggingInterceptor()
             httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
@@ -46,7 +51,7 @@ interface OcrApi {
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
-                .create(OcrApi::class.java)
+                .create(BackendApi::class.java)
         }
     }
 }
