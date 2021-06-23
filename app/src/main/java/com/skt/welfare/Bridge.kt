@@ -82,25 +82,9 @@ class Bridge(private val mContext: Context){
 
         val intent = Intent((mContext as MainActivity), ImageActivity::class.java)
         intent.putExtra("fileName", fileName)
+        intent.putExtra("filePath", filePath)
 
-        val api = BackendApi.create()
-        api.postImage(ImageRequest(
-            filePath = filePath
-        )).enqueue(object : Callback<ImageResponse> {
-            override fun onResponse(
-                call: Call<ImageResponse>,
-                response: Response<ImageResponse>
-            ) {
-                intent.putExtra("imageBase64", response?.body()?.data)
-
-                // 성공
-                (mContext as MainActivity).startActivityForResult(intent, IMAGE_REQ_CODE)
-            }
-            override fun onFailure(call: Call<ImageResponse>, t: Throwable) {
-                Log.e(TAG, t.stackTraceToString())
-                Toast.makeText(mContext, "서버 에러", Toast.LENGTH_SHORT).show()
-            }
-        })
+        (mContext as MainActivity).startActivityForResult(intent, IMAGE_REQ_CODE)
 
 
     }
