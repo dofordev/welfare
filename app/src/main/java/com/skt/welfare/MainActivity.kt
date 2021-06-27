@@ -367,7 +367,7 @@ class MainActivity : AppCompatActivity() {
     private fun getFiles(_isCapture: Boolean, selectedType: Int, fileChooserParams: WebChromeClient.FileChooserParams) {
         val intentCamera = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-        val path = getFilesDir()
+        val path = Environment.getExternalStorageDirectory()
         val timeStamp = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
         val fileName = "welfare_camera_${timeStamp}.png"
         val file = File(path, fileName)
