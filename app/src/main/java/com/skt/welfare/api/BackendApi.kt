@@ -15,12 +15,13 @@ import java.util.concurrent.TimeUnit
 interface BackendApi {
 
     @Multipart
-    @POST("api/bsns/mdcl/user/reqOcrFileRgcn")
+    @POST
     fun postOcrImage(
+        @Url url : String,
         @Part image: MultipartBody.Part
     ): Call<OcrResponse>
 
-    @POST("api/adm/getEncodedImage")
+    @POST("/api/adm/getEncodedImage")
     fun postImage(
         @Body params: ImageRequest
     ): Call<ImageResponse>

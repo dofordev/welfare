@@ -69,12 +69,12 @@ class Bridge(private val mContext: Context){
 
 
     @JavascriptInterface
-    fun callOcrCamera(callbackFnName: String, token: String) {
+    fun callOcrCamera(callbackFnName: String, token: String, apiPath : String) {
         Constants.token = token
         EzdocuSDK.open((mContext as MainActivity), Constants.cameraCompanyCode, Constants.cameraJobNo)
         val option = TakePictureOption.CreateInsure43()
         option.retry = 1
-        EzdocuSDK.takePicture(option, OcrCallback(callbackFnName, mContext))
+        EzdocuSDK.takePicture(option, OcrCallback(callbackFnName, mContext, apiPath))
     }
     @JavascriptInterface
     fun imageViewer(token: String, fileName: String, filePath: String) {
@@ -91,10 +91,11 @@ class Bridge(private val mContext: Context){
 
 }
 
-class OcrCallback(callbackFnName : String, context : Context) : TakePictureCallback {
+class OcrCallback(callbackFnName : String, context : Context, apiPath : String) : TakePictureCallback {
     val webview = (context as MainActivity).webView
     val callbackFnName = callbackFnName
     val context = context
+    val apiPath = apiPath
     override fun onComplete(executeResult: ExecuteResult?) {
         val lensPosResult = executeResult?.lensPosResult
         val polyImgResult = executeResult?.polyImgResult
@@ -122,7 +123,7 @@ class OcrCallback(callbackFnName : String, context : Context) : TakePictureCallb
 
 
             val api = BackendApi.create()
-            api.postOcrImage(body).enqueue(object : Callback<OcrResponse> {
+            api.postOcrImage(apiPath, body).enqueue(object : Callback<OcrResponse> {
                 override fun onResponse(
                     call: Call<OcrResponse>,
                     response: Response<OcrResponse>
