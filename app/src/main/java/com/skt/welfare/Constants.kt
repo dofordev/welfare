@@ -19,6 +19,9 @@ object Constants {
 
     val ocrImgFolder = "welfare"
 
+
+    val benepiaAppId = "com.sk.benepia"
+
     val toktokAppId = "Z000ST0057"
     val toktokDevUrl = "https://devgmp.sktelecom.com:9443"
     val toktokPrdUrl = "https://m.toktok.sk.com:9443"

@@ -23,7 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
-import com.google.gson.Gson
+import androidx.core.content.ContextCompat.startActivity
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
 import retrofit2.Call
@@ -223,6 +223,8 @@ class MainActivity : AppCompatActivity() {
                 loadUrl(url)
             }
         }
+
+
 
     }
     fun View.hideKeyboard() {
@@ -672,8 +674,8 @@ val handler: Handler = object : Handler() {
 
 class CustomWebViewClient : WebViewClient() {
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        super.onPageStarted(view, url, favicon)
 
+        super.onPageStarted(view, url, favicon)
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
@@ -723,10 +725,13 @@ class CustomWebViewClient : WebViewClient() {
 
     override fun shouldOverrideUrlLoading(
             view: WebView?,
-            request: WebResourceRequest?
+            url: String
     ): Boolean {
-
-        return super.shouldOverrideUrlLoading(view, request)
+        if(!url!!.contains(Constants.baseUrl)){
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            context.startActivity(intent)
+        }
+        return true
     }
 }
 

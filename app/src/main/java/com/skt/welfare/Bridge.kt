@@ -1,15 +1,14 @@
 package com.skt.welfare
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import com.ezdocu.sdk.camera.ExecuteResult
 import com.ezdocu.sdk.camera.EzdocuSDK
 import com.ezdocu.sdk.camera.TakePictureCallback
@@ -88,6 +87,20 @@ class Bridge(private val mContext: Context){
 
 
     }
+    @JavascriptInterface
+    fun benepia() {
+
+        try{
+            val intent: Intent? = (mContext as MainActivity).packageManager.getLaunchIntentForPackage(Constants.benepiaAppId)
+            (mContext as MainActivity).startActivity(intent)
+        }
+        catch(e: java.lang.Exception){
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse("market://details?id=" + Constants.benepiaAppId)
+            (mContext as MainActivity).startActivity(intent)
+        }
+    }
+
 
 }
 
