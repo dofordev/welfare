@@ -220,7 +220,7 @@ class MainActivity : AppCompatActivity() {
         else{
             mWebView.run {
                 webViewClient = CustomWebViewClient()
-                loadUrl(url)
+                loadUrl(url + "?t=" + System.currentTimeMillis())
             }
         }
 
