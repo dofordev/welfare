@@ -12,6 +12,32 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Welfare"
         android:usesCleartextTraffic="true">
+
+        <service
+            android:name="com.skt.welfare.FireBaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+<!--        <meta-data-->
+<!--            android:name="com.google.firebase.messaging.default_notification_icon"-->
+<!--            android:resource="@drawable/ic_stat_ic_notification" />-->
+<!--        &lt;!&ndash; Set color used with incoming notification messages. This is used when no color is set for the incoming-->
+<!--             notification message. See README(https://goo.gl/6BKBk7) for more. &ndash;&gt;-->
+<!--        <meta-data-->
+<!--            android:name="com.google.firebase.messaging.default_notification_color"-->
+<!--            android:resource="@color/colorAccent" />-->
+<!--        <meta-data-->
+<!--            android:name="com.google.firebase.messaging.default_notification_channel_id"-->
+<!--            android:value="@string/default_notification_channel_id" />-->
+
         <activity android:name=".ImageActivity"></activity>
         <activity
             android:name=".MainActivity"
@@ -25,6 +51,7 @@
                                 <category android:name="android.intent.category.DEFAULT"/>
                                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="market" android:host="details"/>
+
             </intent-filter>
         </activity>
         <activity

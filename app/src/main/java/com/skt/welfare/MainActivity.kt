@@ -24,6 +24,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
 import retrofit2.Call
@@ -41,7 +43,6 @@ import kotlin.collections.HashMap
 var splashView: View? = null
 var wrap_content : View? = null
 
-private const val TAG = "MainActivity"
 var back_cnt = 0
 
 val CAMERA_PERMISSION = arrayOf(Manifest.permission.CAMERA)
@@ -68,7 +69,9 @@ private var authFlag = false
 
 
 class MainActivity : AppCompatActivity() {
-
+    companion object {
+        private const val TAG = "MainActivity"
+    }
     //뒤로가기 연속 클릭 대기 시간
     private var mBackWait:Long = 0
     private var mBackWaitthird:Long = 0
@@ -78,7 +81,11 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var retryBtn : Button;
 
-
+    fun runtimeEnableAutoInit() {
+        // [START fcm_runtime_enable_auto_init]
+        Firebase.messaging.isAutoInitEnabled = true
+        // [END fcm_runtime_enable_auto_init]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -680,7 +687,6 @@ class CustomWebViewClient : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
 
-        Log.d(TAG, "onPageFinished")
         if(getNetworkConnected()){
             Handler().postDelayed({
 
