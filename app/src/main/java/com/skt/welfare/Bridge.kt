@@ -101,6 +101,12 @@ class Bridge(private val mContext: Context){
         }
     }
 
+    @JavascriptInterface
+    fun externalBrowser(url: String){
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        (mContext as MainActivity).startActivity(intent)
+    }
+
 
 }
 

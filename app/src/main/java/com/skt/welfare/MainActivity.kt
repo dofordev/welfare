@@ -3,15 +3,15 @@ package com.skt.welfare
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ContentValues
-import android.content.Context
-import android.content.Intent
+import android.app.DownloadManager
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.*
 import android.os.*
 import android.provider.MediaStore
 import android.telephony.TelephonyManager
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -86,6 +86,8 @@ class MainActivity : AppCompatActivity() {
         Firebase.messaging.isAutoInitEnabled = true
         // [END fcm_runtime_enable_auto_init]
     }
+
+    private var downloadId:Long = 0;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -168,17 +170,50 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        //파일 다운로드
+        mWebView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+            var downloadManager = context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            var _contentDisposition = URLDecoder.decode(contentDisposition, "UTF-8")
+            var _mimetype = mimetype
+            // 파일명 정제 시작
+            var fileName = _contentDisposition.replace("attachment; filename=", "")
+            if (!TextUtils.isEmpty(fileName)) {
+                _mimetype = MimeTypeMap.getSingleton().getMimeTypeFromExtension(mimetype)
+                if (fileName.endsWith(";")) { fileName = fileName.substring(0, fileName.length - 1) }
+                if (fileName.startsWith("\"") && fileName.endsWith("\"")) { fileName = fileName.substring(1, fileName.length - 1) }
+            }
+            // 파일명 정제 끝
+
+            var request = DownloadManager.Request(Uri.parse(url)).apply {
+                setMimeType(_mimetype)
+                addRequestHeader("User-Agent", userAgent)
+                setDescription("Downloading File")
+                setAllowedOverMetered(true)
+                setAllowedOverRoaming(true)
+                setTitle(fileName)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { setRequiresCharging(false) }
+                allowScanningByMediaScanner()
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+
+            }
+            registerDownloadReceiver(downloadManager, this)
+            downloadId = downloadManager.enqueue(request)
+            Toast.makeText(context, "다운로드 시작", Toast.LENGTH_SHORT).show()
+
+        })
+
         if(BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true);
 
 
 
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
         mWebSettings.javaScriptEnabled = true // 웹페이지 자바스클비트 허용 여부
-        mWebSettings.setSupportMultipleWindows(false) // 새창 띄우기 허용 여부
-        mWebSettings.javaScriptCanOpenWindowsAutomatically = false // 자바스크립트 새창 띄우기(멀티뷰) 허용 여부
+        mWebSettings.setSupportMultipleWindows(true) // 새창 띄우기 허용 여부
+        mWebSettings.javaScriptCanOpenWindowsAutomatically = true // 자바스크립트 새창 띄우기(멀티뷰) 허용 여부
         mWebSettings.loadWithOverviewMode = true // 메타태그 허용 여부
         mWebSettings.useWideViewPort = true // 화면 사이즈 맞추기 허용 여부
-        mWebSettings.setSupportZoom(true) // 화면 줌 허용 여부
+        mWebSettings.setSupportZoom(false) // 화면 줌 허용 여부
         mWebSettings.builtInZoomControls = false // 화면 확대 축소 허용 여부
         mWebSettings.cacheMode = WebSettings.LOAD_NO_CACHE // 브라우저 캐시 허용 여부
         mWebSettings.domStorageEnabled = true // 로컬저장소 허용 여부
@@ -213,7 +248,35 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+    private fun registerDownloadReceiver(downloadManager: DownloadManager, activity: MainActivity) {
+        var downloadReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                var id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) ?: -1
+                when (intent?.action) {
+                    DownloadManager.ACTION_DOWNLOAD_COMPLETE -> {
+                        if(downloadId == id){
+                            val query: DownloadManager.Query = DownloadManager.Query()
+                            query.setFilterById(id)
+                            var cursor = downloadManager.query(query)
+                            if (!cursor.moveToFirst()) return
+                            var columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+                            var status = cursor.getInt(columnIndex)
+                            if (status == DownloadManager.STATUS_SUCCESSFUL) Toast.makeText(context, "다운로드가 완료됐습니다.", Toast.LENGTH_SHORT).show()
+                            else if (status == DownloadManager.STATUS_FAILED) Toast.makeText(context, "다운로드가 실패했습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
 
+                }
+
+            }
+        }
+
+
+        IntentFilter().run {
+            addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+            activity.registerReceiver(downloadReceiver, this)
+        }
+    }
 
     fun goMain(url: String){
         authFlag = true
@@ -730,14 +793,10 @@ class CustomWebViewClient : WebViewClient() {
     }
 
     override fun shouldOverrideUrlLoading(
-            view: WebView?,
-            url: String
+        view: WebView?,
+        request: WebResourceRequest?
     ): Boolean {
-        if(!url!!.contains(Constants.baseUrl)){
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            context.startActivity(intent)
-        }
-        return true
+        return super.shouldOverrideUrlLoading(view, request)
     }
 }
 
