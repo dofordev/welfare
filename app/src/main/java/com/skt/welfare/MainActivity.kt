@@ -119,8 +119,8 @@ class MainActivity : AppCompatActivity() {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
-            val token = task.result
-            Log.d(TAG, token)
+            Constants.deviceToken = task.result.toString()
+            Log.d(TAG, Constants.deviceToken)
         })
 
 

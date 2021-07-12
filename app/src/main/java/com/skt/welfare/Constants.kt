@@ -44,5 +44,6 @@ object Constants {
     var token = ""
 
 
+    var deviceToken = "";
     var loginInfo: TokTokResponse? = null
 }
