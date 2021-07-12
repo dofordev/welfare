@@ -23,8 +23,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.ktx.messaging
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
@@ -57,7 +58,7 @@ private lateinit var mWebView : WebView
 
 var webviewReloadFlag = false
 
-
+private const val TAG = "MainActivity"
 var filePathCallbackLollipop: ValueCallback<Array<Uri>>? = null
 const val FILECHOOSER_REQ_CODE = 2002
 const val TOKTOK_REQ_CODE = 1007
@@ -69,9 +70,7 @@ private var authFlag = false
 
 
 class MainActivity : AppCompatActivity() {
-    companion object {
-        private const val TAG = "MainActivity"
-    }
+
     //뒤로가기 연속 클릭 대기 시간
     private var mBackWait:Long = 0
     private var mBackWaitthird:Long = 0
@@ -81,11 +80,6 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var retryBtn : Button;
 
-    fun runtimeEnableAutoInit() {
-        // [START fcm_runtime_enable_auto_init]
-        Firebase.messaging.isAutoInitEnabled = true
-        // [END fcm_runtime_enable_auto_init]
-    }
 
     private var downloadId:Long = 0;
 
@@ -120,7 +114,15 @@ class MainActivity : AppCompatActivity() {
 */
 
 
-
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+            val token = task.result
+            Log.d(TAG, token)
+            Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
+        })
 
 
         mWebView = findViewById(R.id.web_view)
