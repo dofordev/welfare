@@ -121,7 +121,6 @@ class MainActivity : AppCompatActivity() {
             }
             val token = task.result
             Log.d(TAG, token)
-            Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
         })
 
 
