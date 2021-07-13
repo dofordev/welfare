@@ -33,6 +33,7 @@ interface BackendApi {
             httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
             val headerInterceptor = Interceptor {
+
                 val request = it.request()
                     .newBuilder()
                     .addHeader("withCredentials", "true")
@@ -42,9 +43,11 @@ interface BackendApi {
             }
 
             val client = OkHttpClient.Builder()
-                .readTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
                 .addInterceptor(headerInterceptor)
                 .addInterceptor(httpLoggingInterceptor)
+
                 .build()
 
             return Retrofit.Builder()

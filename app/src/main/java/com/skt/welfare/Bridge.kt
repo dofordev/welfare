@@ -1,5 +1,6 @@
 package com.skt.welfare
 
+import android.app.ProgressDialog
 import android.content.*
 import android.graphics.Bitmap
 import android.net.Uri
@@ -25,6 +26,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
@@ -141,6 +144,11 @@ class OcrCallback(callbackFnName : String, context : Context, apiPath : String) 
             val body = MultipartBody.Part.createFormData("mstFile", fileName, requestFile)
 
 
+            val progress = ProgressDialog(context, R.style.MyTheme)
+            progress.setCancelable(false) // disable dismiss by tapping outside of the dialog
+            progress.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+            progress.show()
+
             val api = BackendApi.create()
             api.postOcrImage(apiPath, body).enqueue(object : Callback<OcrResponse> {
                 override fun onResponse(
@@ -148,6 +156,7 @@ class OcrCallback(callbackFnName : String, context : Context, apiPath : String) 
                     response: Response<OcrResponse>
                 ) {
 
+                    progress.dismiss()
                     // 성공
                     webview.post(Runnable { webview.evaluateJavascript("${callbackFnName}(${Gson().toJson(response?.body())});", ValueCallback(){}) })
                 }
@@ -155,6 +164,7 @@ class OcrCallback(callbackFnName : String, context : Context, apiPath : String) 
                 override fun onFailure(call: Call<OcrResponse>, t: Throwable) {
                     Log.e(TAG, t.stackTraceToString())
 
+                    progress.dismiss()
                     val res = OcrResponse(
                         resultMsg ="응답 없음",
                         resultCd = 888,
@@ -162,8 +172,13 @@ class OcrCallback(callbackFnName : String, context : Context, apiPath : String) 
                         data = null
                     )
 
-                    // 실패
-                    webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(res)});") })
+                    if (t is SocketTimeoutException || t is IOException) {
+                        webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(res)});")})
+                    } else{
+                        // 실패
+                        webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(call)});")})
+                    }
+
                 }
             })
 

@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
+import android.app.ProgressDialog
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -24,9 +25,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.ktx.messaging
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
 import retrofit2.Call
@@ -113,6 +112,11 @@ class MainActivity : AppCompatActivity() {
         }
 */
 
+
+
+// To dismiss the dialog
+// To dismiss the dialog
+//        progress.dismiss()
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
