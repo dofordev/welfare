@@ -124,7 +124,7 @@ class OcrCallback(callbackFnName : String, context : Context, apiPath : String) 
         executeResult?.deskew?.data
 
         executeResult?.deskew?.bitmapBytes()
-        val bitmap  = executeResult?.original?.toBitmap()
+        val bitmap  = executeResult?.deskew?.toBitmap()//executeResult?.original?.toBitmap()
 
 
         try {
