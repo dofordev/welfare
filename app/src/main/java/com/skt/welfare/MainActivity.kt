@@ -123,8 +123,8 @@ class MainActivity : AppCompatActivity() {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
-            Constants.deviceToken = task.result.toString()
-            Log.d(TAG, Constants.deviceToken)
+            Constants.loginInfo = TokTokResponse(deviceToken = task.result.toString())
+
         })
 
 
@@ -498,7 +498,10 @@ class MainActivity : AppCompatActivity() {
                             response: Response<TokTokResponse>
                         ) {
 
-                            Constants.loginInfo = response.body()
+
+                            Constants.loginInfo = response.body()?.copy(
+                                deviceToken = Constants.loginInfo!!.deviceToken
+                            )
 
 
                             val email = response.body()?.email

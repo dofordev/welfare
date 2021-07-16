@@ -7,18 +7,19 @@ import com.tickaroo.tikxml.annotation.Xml
 data class TokTokResponse(
 
     @PropertyElement
-    val result: String?,
+    var result: String? = "",
     @PropertyElement
-    val resultMessage: String?,
+    var resultMessage: String? = "",
     @PropertyElement
-    val email: String?,
+    var email: String? = "",
     @PropertyElement
-    val empId : String?,
+    var empId : String? = "",
     @PropertyElement
-    val loginId : String?,
+    var loginId : String? = "",
     @PropertyElement
-    val primitive : String?
-
+    var primitive : String? = "",
+    @PropertyElement
+    var deviceToken : String? = ""
 )
 
 
