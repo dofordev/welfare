@@ -114,9 +114,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-// To dismiss the dialog
-// To dismiss the dialog
-//        progress.dismiss()
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
