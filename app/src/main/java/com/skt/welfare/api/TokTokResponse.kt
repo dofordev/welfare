@@ -19,7 +19,9 @@ data class TokTokResponse(
     @PropertyElement
     var primitive : String? = "",
     @PropertyElement
-    var deviceToken : String? = ""
+    var deviceToken : String? = "",
+    @PropertyElement
+    var mblTypCd : String = "A"
 )
 
 
