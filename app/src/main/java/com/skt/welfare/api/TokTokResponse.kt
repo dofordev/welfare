@@ -7,17 +7,17 @@ import com.tickaroo.tikxml.annotation.Xml
 data class TokTokResponse(
 
     @PropertyElement
-    var result: String? = "",
+    var result: String? = "1000",
     @PropertyElement
-    var resultMessage: String? = "",
+    var resultMessage: String? = "서비스 요청 성공",
     @PropertyElement
-    var email: String? = "",
+    var email: String? = "lilykang@sk.com",
     @PropertyElement
-    var empId : String? = "",
+    var empId : String? = "01103901",
     @PropertyElement
-    var loginId : String? = "",
+    var loginId : String? = "SKT.01103901",
     @PropertyElement
-    var primitive : String? = "",
+    var primitive : String? = "COMMON_COMMON_EMPINFO",
     @PropertyElement
     var deviceToken : String? = "",
     @PropertyElement
