@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         var toktokPackagename = if(isTablet(context)) Constants.toktokTabletPackageName else Constants.toktokPhonePackageName
         val i = Intent(Intent.ACTION_VIEW)
         i.data = Uri.parse(Constants.storeUrl)
-        /*
+
         //스토어 설치 체크
         if(!checkInstallationOf(context, storePackagename)) {
             startActivity(i)
@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(i)
             finish()
         }
-*/
+
 
 
 
