@@ -103,6 +103,22 @@ class Bridge(private val mContext: Context){
             (mContext as MainActivity).startActivity(intent)
         }
     }
+    @JavascriptInterface
+    fun dywt() {
+        if(!checkInstallationOf(mContext, Constants.vacationPackageName)) {
+            val installUrl = if(isTablet(mContext)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.vacationAppId}"
+            else "toktok://com.skt.pe.activity.mobileclient.detail?appId=${Constants.vacationAppId}"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_NO_HISTORY
+            (mContext as MainActivity).startActivity(intent)
+        }
+        else{
+            val schemeUrl = "dywt://com.gmp.skt.dywt.mobile"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(schemeUrl))
+            (mContext as MainActivity).startActivity(intent)
+        }
+    }
+
 
     @JavascriptInterface
     fun externalBrowser(url: String){

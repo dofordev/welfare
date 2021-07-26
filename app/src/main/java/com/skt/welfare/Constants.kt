@@ -37,6 +37,9 @@ object Constants {
     val toktokPhoneActionName = "com.sk.pe.group.auth.GMP_LOGIN"
     val toktokTabletActionName = "com.sk.pe.auth.GMP_LOGIN"
 
+    val vacationPackageName = "com.gmp.skt.dywt.mobile"
+    val vacationAppId = "Z000ST0049";
+
     val storeUrl = "https://m.toktok.sk.com/fordev.jsp"
 
     var phoneNumber = ""
