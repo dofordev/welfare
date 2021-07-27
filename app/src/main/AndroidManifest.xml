@@ -55,6 +55,7 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="market" android:host="details"/>
 
+                <data android:scheme="dywt" android:host="com.gmp.skt.dywt.mobile"/>
             </intent-filter>
         </activity>
         <activity
