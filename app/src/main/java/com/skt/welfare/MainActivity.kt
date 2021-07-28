@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        /*
+
         //스토어 설치 체크
         if(!checkInstallationOf(context, storePackagename)) {
             startActivity(i)
@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(i)
             finish()
         }
-*/
+
 
 
 
@@ -284,7 +284,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goMain(url: String){
-        authFlag = true
+//        authFlag = true
 
         if(!authFlag){
             var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
