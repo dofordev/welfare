@@ -102,7 +102,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
         /*
         //스토어 설치 체크
         if(!checkInstallationOf(context, storePackagename)) {

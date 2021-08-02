@@ -160,10 +160,14 @@ class OcrCallback(callbackFnName : String, context : Context, apiPath : String) 
             val body = MultipartBody.Part.createFormData("mstFile", fileName, requestFile)
 
 
-            val progress = ProgressDialog(context, R.style.MyTheme)
-            progress.setCancelable(false) // disable dismiss by tapping outside of the dialog
-            progress.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+//            val progress = ProgressDialog(context, R.style.MyTheme)
+//            progress.setCancelable(false) // disable dismiss by tapping outside of the dialog
+//            progress.setProgressStyle(android.R.style.Widget_ProgressBar_Small)
+//            progress.show()
+
+            val progress = LoadingDialog(context)
             progress.show()
+
 
             val api = BackendApi.create()
             api.postOcrImage(apiPath, body).enqueue(object : Callback<OcrResponse> {
