@@ -223,10 +223,7 @@ class MainActivity : AppCompatActivity() {
         mWebSettings.builtInZoomControls = false // 화면 확대 축소 허용 여부
         mWebSettings.cacheMode = WebSettings.LOAD_NO_CACHE // 브라우저 캐시 허용 여부
         mWebSettings.domStorageEnabled = true // 로컬저장소 허용 여부
-        mWebSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // 브라우저 캐시 허용 여부
-        mWebSettings.domStorageEnabled = true
-
-
+        mWebSettings.setAppCacheEnabled(false)
 
         //권한체크
         val cameraPermiossion = checkPermission(CAMERA_PERMISSION, FLAG_PERMISSION_CAMERA)
@@ -296,6 +293,7 @@ class MainActivity : AppCompatActivity() {
         else{
             mWebView.run {
                 webViewClient = CustomWebViewClient()
+                clearCache(true)
                 loadUrl(url + "?t=" + System.currentTimeMillis())
             }
         }
