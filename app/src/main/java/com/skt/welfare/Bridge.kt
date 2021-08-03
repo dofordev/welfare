@@ -119,6 +119,20 @@ class Bridge(private val mContext: Context){
         }
     }
 
+    @JavascriptInterface
+    fun tmap() {
+
+        try{
+            val intent: Intent? = (mContext as MainActivity).packageManager.getLaunchIntentForPackage(Constants.tmapAppId)
+            (mContext as MainActivity).startActivity(intent)
+        }
+        catch(e: java.lang.Exception){
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse("market://details?id=" + Constants.tmapAppId)
+            (mContext as MainActivity).startActivity(intent)
+        }
+    }
+
 
     @JavascriptInterface
     fun externalBrowser(url: String){
