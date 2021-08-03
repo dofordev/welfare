@@ -65,6 +65,7 @@ const val IMAGE_REQ_CODE = 1000
 private var cameraImageUri: Uri? = null
 
 private var authFlag = false
+private var qaFlag = true
 
 
 
@@ -102,21 +103,18 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        /*
-        //스토어 설치 체크
-        if(!checkInstallationOf(context, storePackagename)) {
-            startActivity(i)
-            finish()
+        if(!qaFlag){
+            //스토어 설치 체크
+            if(!checkInstallationOf(context, storePackagename)) {
+                startActivity(i)
+                finish()
+            }
+            //톡톡 설치 체크
+            else if(!checkInstallationOf(context, toktokPackagename)) {
+                startActivity(i)
+                finish()
+            }
         }
-        //톡톡 설치 체크
-        else if(!checkInstallationOf(context, toktokPackagename)) {
-            startActivity(i)
-            finish()
-        }
-*/
-
-
-
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -282,7 +280,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goMain(url: String){
-        authFlag = true
+        if(qaFlag) authFlag = true
 
         if(!authFlag){
             var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
