@@ -18,7 +18,7 @@
             android:minHeight="50dp"
             android:minWidth="50dp"
             android:layout_marginTop="20dp"
-            android:indeterminateTint="#DCDCDC"
+            android:indeterminateTint="#1890FF"
             android:id="@+id/progressBar2"/>
         <TextView
             android:text="OCR 인식 중입니다."
@@ -28,7 +28,7 @@
             android:gravity="center"
             android:textAlignment="center"
             android:layout_marginTop="20dp"
-            android:textColor="#DCDCDC"/>
+            android:textColor="#1890FF"/>
     </LinearLayout>
 
 
