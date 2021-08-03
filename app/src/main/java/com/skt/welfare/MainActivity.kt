@@ -131,6 +131,7 @@ class MainActivity : AppCompatActivity() {
         mWebView = findViewById(R.id.web_view)
         webView = findViewById(R.id.web_view)
         wrap_content = findViewById(R.id.wrap_content)
+        splashView = findViewById(R.id.splash_view)
 
         retryBtn = findViewById(R.id.retry_btn)
 
@@ -755,7 +756,9 @@ class CustomWebViewClient : WebViewClient() {
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
-
+        splashView?.visibility = View.GONE
+        mWebView?.visibility = View.VISIBLE
+        /*
         if(getNetworkConnected()){
             Handler().postDelayed({
 
@@ -774,8 +777,7 @@ class CustomWebViewClient : WebViewClient() {
             msg.data = data
             handler.sendMessage(msg)
         }
-
-
+*/
         super.onPageFinished(view, url)
     }
 
