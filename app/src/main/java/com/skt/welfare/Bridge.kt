@@ -31,6 +31,10 @@ import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
+import com.skt.Tmap.TMapTapi
+
+
+
 
 
 private const val TAG = "Bridge"
@@ -120,17 +124,26 @@ class Bridge(private val mContext: Context){
     }
 
     @JavascriptInterface
-    fun tmap() {
+    fun tmap(keyword : String) {
+        val tmaptapi = TMapTapi(mContext)
+        tmaptapi.setSKTMapAuthentication(Constants.tmapApiKey)
+        val isTmapApp: Boolean = tmaptapi.isTmapApplicationInstalled
+        if(isTmapApp){
+            tmaptapi.invokeSearchPortal(keyword)
+        }
+        else{
+            var downloadUrl = ""
+            val result = tmaptapi.tMapDownUrl
+            result?.forEach { item -> downloadUrl = item.toString() }
+            if(!downloadUrl.equals("")){
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(downloadUrl))
+                intent.setPackage("com.android.chrome")
+                (mContext as MainActivity).startActivity(intent)
+            }
 
-        try{
-            val intent: Intent? = (mContext as MainActivity).packageManager.getLaunchIntentForPackage(Constants.tmapAppId)
-            (mContext as MainActivity).startActivity(intent)
         }
-        catch(e: java.lang.Exception){
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("market://details?id=" + Constants.tmapAppId)
-            (mContext as MainActivity).startActivity(intent)
-        }
+
+
     }
 
 

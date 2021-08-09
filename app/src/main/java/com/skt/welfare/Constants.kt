@@ -24,7 +24,7 @@ object Constants {
 
 
     val benepiaAppId = "com.sk.benepia"
-    val tmapAppId = "com.skt.tmap.ku"
+    val tmapApiKey = "l7xx6b03efc9ecf74b5488741abe9ffc7392"
 
     val toktokAppId = "Z000ST0057"
     val toktokDevUrl = "https://devgmp.sktelecom.com:9443"

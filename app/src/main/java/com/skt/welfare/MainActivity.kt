@@ -26,6 +26,7 @@ import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import com.skt.Tmap.TMapTapi
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
 import retrofit2.Call
@@ -38,6 +39,7 @@ import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.log
 
 
 var splashView: View? = null
@@ -94,6 +96,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+        
         authFlag = false
 
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
