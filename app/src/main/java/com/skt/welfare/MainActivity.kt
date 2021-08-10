@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
-import android.app.ProgressDialog
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -24,6 +23,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
+import com.ez_docu.ezspluslib.BuildConfig
+
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.skt.Tmap.TMapTapi
@@ -39,7 +40,6 @@ import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
-import kotlin.math.log
 
 
 var splashView: View? = null
@@ -67,7 +67,7 @@ const val IMAGE_REQ_CODE = 1000
 private var cameraImageUri: Uri? = null
 
 private var authFlag = false
-private var qaFlag = true
+private var qaFlag = false
 
 
 
@@ -78,26 +78,20 @@ class MainActivity : AppCompatActivity() {
     private var mBackWaitthird:Long = 0
 
 
-    lateinit var webView : WebView;
 
-    lateinit var retryBtn : Button;
+    lateinit var retryBtn : Button
 
 
-    private var downloadId:Long = 0;
+    private var downloadId:Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        context = this;
+        context = this
 //        splashView = findViewById(R.id.view)
 
 //        val mWebView : WebView = findViewById(R.id.web_view)
-
-
-
-        
-        authFlag = false
 
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
         var toktokPackagename = if(isTablet(context)) Constants.toktokTabletPackageName else Constants.toktokPhonePackageName
@@ -105,6 +99,8 @@ class MainActivity : AppCompatActivity() {
         i.data = Uri.parse(Constants.storeUrl)
 
 
+        Constants.tmaptapi = TMapTapi(this)
+        Constants.tmaptapi?.setSKTMapAuthentication(Constants.tmapApiKey)
 
         if(!qaFlag){
             //스토어 설치 체크
@@ -130,7 +126,6 @@ class MainActivity : AppCompatActivity() {
 
 
         mWebView = findViewById(R.id.web_view)
-        webView = findViewById(R.id.web_view)
         wrap_content = findViewById(R.id.wrap_content)
         splashView = findViewById(R.id.splash_view)
 
@@ -210,8 +205,9 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        if(BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true);
 
+
+//        if(BuildConfig.FLAVOR.equals("DEV")) WebView.setWebContentsDebuggingEnabled(true)
 
 
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
@@ -225,6 +221,8 @@ class MainActivity : AppCompatActivity() {
         mWebSettings.cacheMode = WebSettings.LOAD_NO_CACHE // 브라우저 캐시 허용 여부
         mWebSettings.domStorageEnabled = true // 로컬저장소 허용 여부
         mWebSettings.setAppCacheEnabled(false)
+
+
 
         //권한체크
         val cameraPermiossion = checkPermission(CAMERA_PERMISSION, FLAG_PERMISSION_CAMERA)
@@ -497,7 +495,6 @@ class MainActivity : AppCompatActivity() {
                             call: Call<TokTokResponse>,
                             response: Response<TokTokResponse>
                         ) {
-
 
                             Constants.loginInfo = response.body()?.copy(
                                 deviceToken = Constants.loginInfo!!.deviceToken

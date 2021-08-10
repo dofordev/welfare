@@ -1,5 +1,6 @@
 package com.skt.welfare
 
+import com.skt.Tmap.TMapTapi
 import com.skt.welfare.api.TokTokResponse
 
 object Constants {
@@ -29,6 +30,7 @@ object Constants {
     val toktokAppId = "Z000ST0057"
     val toktokDevUrl = "https://devgmp.sktelecom.com:9443"
 //    val toktokDevUrl = "https://m.toktok.sk.com:9443"
+//    val toktokPrdUrl = "https://devgmp.sktelecom.com:9443"
     val toktokPrdUrl = "https://m.toktok.sk.com:9443"
 
     val toktokStorePhonePackageName = "com.skt.pe.activity.mobileclient"
@@ -49,4 +51,7 @@ object Constants {
     var token = ""
 
     var loginInfo: TokTokResponse? = null
+
+    var tmaptapi: TMapTapi? = null
+
 }

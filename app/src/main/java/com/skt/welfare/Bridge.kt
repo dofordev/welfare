@@ -1,7 +1,9 @@
 package com.skt.welfare
 
-import android.app.ProgressDialog
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
@@ -9,15 +11,13 @@ import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebView
 import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
 import com.ezdocu.sdk.camera.ExecuteResult
 import com.ezdocu.sdk.camera.EzdocuSDK
 import com.ezdocu.sdk.camera.TakePictureCallback
 import com.ezdocu.sdk.camera.TakePictureOption
 import com.google.gson.Gson
+import com.skt.Tmap.TMapTapi
 import com.skt.welfare.api.BackendApi
-import com.skt.welfare.api.ImageRequest
-import com.skt.welfare.api.ImageResponse
 import com.skt.welfare.api.OcrResponse
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -31,10 +31,6 @@ import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
-import com.skt.Tmap.TMapTapi
-
-
-
 
 
 private const val TAG = "Bridge"
@@ -82,6 +78,8 @@ class Bridge(private val mContext: Context){
         option.retry = 1
         EzdocuSDK.takePicture(option, OcrCallback(callbackFnName, mContext, apiPath))
     }
+
+
     @JavascriptInterface
     fun imageViewer(token: String, fileName: String, filePath: String) {
         Constants.token = token
@@ -124,24 +122,31 @@ class Bridge(private val mContext: Context){
     }
 
     @JavascriptInterface
-    fun tmap(keyword : String) {
-        val tmaptapi = TMapTapi(mContext)
-        tmaptapi.setSKTMapAuthentication(Constants.tmapApiKey)
-        val isTmapApp: Boolean = tmaptapi.isTmapApplicationInstalled
-        if(isTmapApp){
-            tmaptapi.invokeSearchPortal(keyword)
+    fun tmap(keyword : String, lat : String, long : String) {
+
+        if(lat.equals("") || long.equals("")){
+            Toast.makeText(mContext, "지도가 노출된 후 다시 시도해 주세요.", Toast.LENGTH_SHORT).show()
         }
         else{
-            var downloadUrl = ""
-            val result = tmaptapi.tMapDownUrl
-            result?.forEach { item -> downloadUrl = item.toString() }
-            if(!downloadUrl.equals("")){
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(downloadUrl))
-                intent.setPackage("com.android.chrome")
-                (mContext as MainActivity).startActivity(intent)
-            }
 
+
+            val isTmapApp: Boolean? = Constants.tmaptapi?.isTmapApplicationInstalled
+            if(isTmapApp != null && isTmapApp){
+                Constants.tmaptapi?.invokeRoute(keyword, lat.toFloat(), long.toFloat())
+            }
+            else{
+                var downloadUrl = ""
+                val result = Constants.tmaptapi?.tMapDownUrl
+                result?.forEach { item -> downloadUrl = item.toString() }
+                if(!downloadUrl.equals("")){
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(downloadUrl))
+                    intent.setPackage("com.android.chrome")
+                    (mContext as MainActivity).startActivity(intent)
+                }
+
+            }
         }
+
 
 
     }
