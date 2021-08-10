@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity() {
     private var mBackWaitthird:Long = 0
 
 
+    lateinit var webView : WebView
 
     lateinit var retryBtn : Button
 
@@ -126,6 +127,7 @@ class MainActivity : AppCompatActivity() {
 
 
         mWebView = findViewById(R.id.web_view)
+        webView = findViewById(R.id.web_view)
         wrap_content = findViewById(R.id.wrap_content)
         splashView = findViewById(R.id.splash_view)
 
