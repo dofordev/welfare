@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-kapt'
 }
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 android {
     compileSdkVersion 29
     buildToolsVersion "30.0.0"
@@ -22,12 +23,12 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
         }
@@ -103,6 +104,7 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-messaging-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
 
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'

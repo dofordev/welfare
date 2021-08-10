@@ -89,3 +89,4 @@
 
 ##---------------End: proguard configuration for Gson  ----------
 
+-keep class com.ez_docu.ezspluslib.** { *; }

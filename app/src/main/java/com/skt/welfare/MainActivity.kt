@@ -30,6 +30,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.skt.Tmap.TMapTapi
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
+import com.tickaroo.tikxml.annotation.PropertyElement
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -103,6 +104,9 @@ class MainActivity : AppCompatActivity() {
         Constants.tmaptapi = TMapTapi(this)
         Constants.tmaptapi?.setSKTMapAuthentication(Constants.tmapApiKey)
 
+
+
+
         if(!qaFlag){
             //스토어 설치 체크
             if(!checkInstallationOf(context, storePackagename)) {
@@ -116,15 +120,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
-            Constants.loginInfo = TokTokResponse(deviceToken = task.result.toString())
+            if(!qaFlag) {
+                Constants.loginInfo = TokTokResponse(deviceToken = task.result.toString())
+            }
+            else{
+                Constants.loginInfo = TokTokResponse(
+                    deviceToken = task.result.toString()
+                    , result = "1000"
+                    , resultMessage = "서비스 요청 성공"
+                    , email = "lilykang@sk.com"
+                    , empId = "01103901"
+                    , loginId = "SKT.01103901"
+                    , primitive = "COMMON_COMMON_EMPINFO"
+                )
+            }
 
         })
-
 
         mWebView = findViewById(R.id.web_view)
         webView = findViewById(R.id.web_view)
