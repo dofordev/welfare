@@ -413,95 +413,99 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun toktokApi(){
-        val map = getAuthKeyCompanyCDEncPwdMDN(context)
-
-
         if(qaFlag){
             authFlag = true
             goMain()
         }
-        else if( map == null){
-            goMain()
-        }
         else{
-            val companyCd = map?.get("COMPANY_CD")
-            val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
-            val osName = "Android"
-            val groupCd = "SK"
-            val osVersion = android.os.Build.VERSION.SDK_INT
-            val authKey = map?.get("AUTHKEY")
-            val mdn = map?.get("MDN")
-            val appId = Constants.toktokAppId
-            val appVer = BuildConfig.VERSION_NAME
-            val lang = Locale.getDefault().language
-            val api = TokTokApi.create()
+            val map = getAuthKeyCompanyCDEncPwdMDN(context)
 
-            api.auth("COMMON_COMMON_EMPINFO",companyCd,appId, appVer, encPwd, osName,groupCd,lang,authKey,osVersion, mdn).enqueue(object :
-                Callback<TokTokResponse> {
-                override fun onResponse(
-                    call: Call<TokTokResponse>,
-                    response: Response<TokTokResponse>
-                ) {
 
-                    Constants.loginInfo = response.body()?.copy(
-                        deviceToken = Constants.loginInfo!!.deviceToken
-                    )
-                    response.body()?.empId?.let { FirebaseCrashlytics.getInstance().setUserId(it) }
 
-                    val email = response.body()?.email
-                    val result = response.body()?.result
-                    val resultMessage = response.body()?.resultMessage
-                    if(result.equals("1000")){
-                        authFlag = true
-                        goMain()
-                    }
-                    else{
-                        when(result){
-                            "7000","7001","7005","7008","7009","7015" -> {
-                                var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
-                                val intent = Intent(actionName)
-                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                startActivityForResult(intent, TOKTOK_REQ_CODE)
-                            }
-                            "3601","3602","3603" -> {
-                                Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                finishAffinity()
-                                exitProcess(0)
-                            }
-                            "7002","7010","7003","7006","7011","7012" -> {
-                                Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                val intent = Intent(Intent.ACTION_VIEW)
-                                intent.data = Uri.parse(Constants.storeUrl)
-                                startActivity(intent)
-                                finishAffinity()
-                                exitProcess(0)
-                            }
-                            "3205" -> {//인증앱업데이트
-                                val installUrl = if(isTablet(context)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.toktokAppId}"
-                                else "toktok://com.skt.pe.activity.mobileclient.detail?appId=${Constants.toktokAppId}"
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_NO_HISTORY
-                                startActivity(intent)
-                                finishAffinity()
-                                exitProcess(0)
-                            }
-                            else -> {
-                                Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                finishAffinity()
-                                exitProcess(0)
+            if( map == null){
+                goMain()
+            }
+            else{
+                val companyCd = map?.get("COMPANY_CD")
+                val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
+                val osName = "Android"
+                val groupCd = "SK"
+                val osVersion = android.os.Build.VERSION.SDK_INT
+                val authKey = map?.get("AUTHKEY")
+                val mdn = map?.get("MDN")
+                val appId = Constants.toktokAppId
+                val appVer = BuildConfig.VERSION_NAME
+                val lang = Locale.getDefault().language
+                val api = TokTokApi.create()
+
+                api.auth("COMMON_COMMON_EMPINFO",companyCd,appId, appVer, encPwd, osName,groupCd,lang,authKey,osVersion, mdn).enqueue(object :
+                    Callback<TokTokResponse> {
+                    override fun onResponse(
+                        call: Call<TokTokResponse>,
+                        response: Response<TokTokResponse>
+                    ) {
+
+                        Constants.loginInfo = response.body()?.copy(
+                            deviceToken = Constants.loginInfo!!.deviceToken
+                        )
+                        response.body()?.empId?.let { FirebaseCrashlytics.getInstance().setUserId(it) }
+
+                        val email = response.body()?.email
+                        val result = response.body()?.result
+                        val resultMessage = response.body()?.resultMessage
+                        if(result.equals("1000")){
+                            authFlag = true
+                            goMain()
+                        }
+                        else{
+                            when(result){
+                                "7000","7001","7005","7008","7009","7015" -> {
+                                    var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
+                                    val intent = Intent(actionName)
+                                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                    Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
+                                    startActivityForResult(intent, TOKTOK_REQ_CODE)
+                                }
+                                "3601","3602","3603" -> {
+                                    Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
+                                    finishAffinity()
+                                    exitProcess(0)
+                                }
+                                "7002","7010","7003","7006","7011","7012" -> {
+                                    Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
+                                    val intent = Intent(Intent.ACTION_VIEW)
+                                    intent.data = Uri.parse(Constants.storeUrl)
+                                    startActivity(intent)
+                                    finishAffinity()
+                                    exitProcess(0)
+                                }
+                                "3205" -> {//인증앱업데이트
+                                    val installUrl = if(isTablet(context)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.toktokAppId}"
+                                    else "toktok://com.skt.pe.activity.mobileclient.detail?appId=${Constants.toktokAppId}"
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
+                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_NO_HISTORY
+                                    startActivity(intent)
+                                    finishAffinity()
+                                    exitProcess(0)
+                                }
+                                else -> {
+                                    Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
+                                    finishAffinity()
+                                    exitProcess(0)
+                                }
                             }
                         }
                     }
-                }
-                override fun onFailure(call: Call<TokTokResponse>, t: Throwable) {
-                    Log.e(TAG, t.stackTraceToString())
-                    Toast.makeText(context, t.stackTraceToString(), Toast.LENGTH_SHORT).show()
-                    finishAffinity()
-                    exitProcess(0)
-                }
-            })
+                    override fun onFailure(call: Call<TokTokResponse>, t: Throwable) {
+                        Log.e(TAG, t.stackTraceToString())
+                        Toast.makeText(context, t.stackTraceToString(), Toast.LENGTH_SHORT).show()
+                        finishAffinity()
+                        exitProcess(0)
+                    }
+                })
+            }
         }
+
 
 
     }
@@ -739,7 +743,7 @@ fun getMdn(context: Context) : String{
 
             }
         }
-        catch (e :Exception){
+        catch (e : java.lang.Exception){
             Log.e(TAG, "테블릿 유심없음")
         }
 
