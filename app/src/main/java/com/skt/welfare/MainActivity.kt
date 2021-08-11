@@ -93,6 +93,7 @@ class MainActivity : AppCompatActivity() {
         context = this
 //        splashView = findViewById(R.id.view)
 
+
 //        val mWebView : WebView = findViewById(R.id.web_view)
 
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
@@ -231,7 +232,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        WebView.setWebContentsDebuggingEnabled(true)
+//        WebView.setWebContentsDebuggingEnabled(true)
 
 
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
