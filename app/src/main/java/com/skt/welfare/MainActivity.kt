@@ -123,7 +123,21 @@ class MainActivity : AppCompatActivity() {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
-            Constants.loginInfo = TokTokResponse(deviceToken = task.result.toString())
+
+
+
+
+                Constants.loginInfo = TokTokResponse(
+                    deviceToken = task.result.toString()
+                    , result = "1000"
+                    , resultMessage = "서비스 요청 성공"
+                    , email = "lilykang@sk.com"
+                    , empId = "01103901"
+                    , loginId = "SKT.01103901"
+                    , primitive = "COMMON_COMMON_EMPINFO"
+                )
+
+
 
         })
 
