@@ -129,6 +129,7 @@ class MainActivity : AppCompatActivity() {
             }
             if(!qaFlag) {
                 Constants.loginInfo = TokTokResponse(deviceToken = task.result.toString())
+
             }
             else{
 
@@ -144,6 +145,7 @@ class MainActivity : AppCompatActivity() {
                     , loginId = "SKT.01103901"
                     , primitive = "COMMON_COMMON_EMPINFO"
                 )
+
             }
 
         })
@@ -446,7 +448,8 @@ class MainActivity : AppCompatActivity() {
                     ) {
 
                         Constants.loginInfo = response.body()?.copy(
-                            deviceToken = Constants.loginInfo!!.deviceToken
+                            deviceToken = Constants.loginInfo!!.deviceToken,
+                            mblTypCd = "A"
                         )
                         response.body()?.empId?.let { FirebaseCrashlytics.getInstance().setUserId(it) }
 
@@ -815,6 +818,8 @@ class CustomWebViewClient : WebViewClient() {
     override fun onPageFinished(view: WebView?, url: String?) {
         splashView?.visibility = View.GONE
         mWebView?.visibility = View.VISIBLE
+
+
         /*
         if(getNetworkConnected()){
             Handler().postDelayed({
