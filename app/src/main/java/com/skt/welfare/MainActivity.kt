@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        WebView.setWebContentsDebuggingEnabled(true)
+//        WebView.setWebContentsDebuggingEnabled(true)
 
 
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
