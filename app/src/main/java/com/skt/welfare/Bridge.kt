@@ -79,6 +79,16 @@ class Bridge(private val mContext: Context){
         EzdocuSDK.takePicture(option, OcrCallback(callbackFnName, mContext, apiPath))
     }
 
+    @JavascriptInterface
+    fun callOcrImage(callbackFnName: String, token: String, apiPath : String){
+        Constants.token = token
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        intent.putExtra("callbackFnName",callbackFnName)
+        intent.putExtra("apiPath",apiPath)
+        (mContext as MainActivity).startActivityForResult(Intent.createChooser(intent, ""), IMAGE_PICK_CODE)
+    }
 
     @JavascriptInterface
     fun imageViewer(token: String, fileName: String, filePath: String) {
@@ -162,7 +172,6 @@ class Bridge(private val mContext: Context){
 }
 
 class OcrCallback(callbackFnName : String, context : Context, apiPath : String) : TakePictureCallback {
-    val webview = (context as MainActivity).webView
     val callbackFnName = callbackFnName
     val context = context
     val apiPath = apiPath
@@ -174,78 +183,7 @@ class OcrCallback(callbackFnName : String, context : Context, apiPath : String) 
         executeResult?.deskew?.bitmapBytes()
         val bitmap  = executeResult?.deskew?.toBitmap()//executeResult?.original?.toBitmap()
 
-
-        try {
-
-            val timeStamp: String = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
-            val fileName = "ocr_${timeStamp}.jpeg"
-
-
-            val out = ByteArrayOutputStream()
-
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, 50 , out)
-            out.flush()
-            out.close()
-
-            val requestFile: RequestBody =
-                RequestBody.create(MediaType.parse("image/*"), out.toByteArray())
-            val body = MultipartBody.Part.createFormData("mstFile", fileName, requestFile)
-
-
-//            val progress = ProgressDialog(context, R.style.MyTheme)
-//            progress.setCancelable(false) // disable dismiss by tapping outside of the dialog
-//            progress.setProgressStyle(android.R.style.Widget_ProgressBar_Small)
-//            progress.show()
-
-            val progress = LoadingDialog(context)
-            progress.show()
-
-
-            val api = BackendApi.create()
-            api.postOcrImage(apiPath, body).enqueue(object : Callback<OcrResponse> {
-                override fun onResponse(
-                    call: Call<OcrResponse>,
-                    response: Response<OcrResponse>
-                ) {
-
-                    progress.dismiss()
-                    // 성공
-                    webview.post(Runnable { webview.evaluateJavascript("${callbackFnName}(${Gson().toJson(response?.body())});", ValueCallback(){}) })
-                }
-
-                override fun onFailure(call: Call<OcrResponse>, t: Throwable) {
-                    Log.e(TAG, t.stackTraceToString())
-
-                    progress.dismiss()
-                    val res = OcrResponse(
-                        resultMsg ="응답 없음",
-                        resultCd = 888,
-                        resultMsgTyp = "E",
-                        data = null
-                    )
-
-                    if (t is SocketTimeoutException || t is IOException) {
-                        webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(res)});")})
-                    } else{
-                        // 실패
-                        webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(call)});")})
-                    }
-
-                }
-            })
-
-        } catch (e: Exception) {
-            Log.e(TAG, e.stackTraceToString())
-            val res = OcrResponse(
-                resultMsg ="알수 없는 에러",
-                resultCd = 999,
-                resultMsgTyp = "E",
-                data = null
-            )
-
-            // 실패
-            webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(res)});") })
-        }
+        Constants.sendImage(callbackFnName, context, apiPath, bitmap!!)
 
     }
 

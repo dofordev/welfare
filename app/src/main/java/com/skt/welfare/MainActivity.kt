@@ -34,6 +34,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.io.IOException
 import java.net.NetworkInterface
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -65,6 +66,7 @@ var filePathCallbackLollipop: ValueCallback<Array<Uri>>? = null
 const val FILECHOOSER_REQ_CODE = 2002
 const val TOKTOK_REQ_CODE = 1007
 const val IMAGE_REQ_CODE = 1000
+const val IMAGE_PICK_CODE = 2000
 private var cameraImageUri: Uri? = null
 
 private var authFlag = false
@@ -120,8 +122,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
@@ -135,7 +135,6 @@ class MainActivity : AppCompatActivity() {
 
                 FirebaseCrashlytics.getInstance().setUserId("01103901")
 
-
                 Constants.loginInfo = TokTokResponse(
                     deviceToken = task.result.toString()
                     , result = "1000"
@@ -144,6 +143,7 @@ class MainActivity : AppCompatActivity() {
                     , empId = "01103901"
                     , loginId = "SKT.01103901"
                     , primitive = "COMMON_COMMON_EMPINFO"
+                    , mblTypCd = "A"
                 )
 
             }
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-//        WebView.setWebContentsDebuggingEnabled(true)
+        WebView.setWebContentsDebuggingEnabled(true)
 
 
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
@@ -422,14 +422,13 @@ class MainActivity : AppCompatActivity() {
         else{
             val map = getAuthKeyCompanyCDEncPwdMDN(context)
 
-
-
             if( map == null){
                 goMain()
             }
             else{
                 val companyCd = map?.get("COMPANY_CD")
-                val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
+//                val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
+                val encPwd = map?.get("ENC_PWD")
                 val osName = "Android"
                 val groupCd = "SK"
                 val osVersion = android.os.Build.VERSION.SDK_INT
@@ -459,6 +458,7 @@ class MainActivity : AppCompatActivity() {
                         if(result.equals("1000")){
                             authFlag = true
                             goMain()
+
                         }
                         else{
                             when(result){
@@ -604,8 +604,21 @@ class MainActivity : AppCompatActivity() {
             TOKTOK_REQ_CODE -> if (resultCode == RESULT_OK) {
                 toktokApi()
             }
+
             IMAGE_REQ_CODE -> if (resultCode == RESULT_OK) {
 
+            }
+            IMAGE_PICK_CODE -> if (resultCode == RESULT_OK) {
+                Log.e("IMAGE==" , "asd" )
+                val uri = data!!.data
+                try {
+                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+
+                    Constants.sendImage(data.getStringExtra("callbackFnName"), context, data.getStringExtra("apiPath"), bitmap!!)
+
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
             FILECHOOSER_REQ_CODE -> if (resultCode == RESULT_OK) {
                 if (filePathCallbackLollipop == null) return
