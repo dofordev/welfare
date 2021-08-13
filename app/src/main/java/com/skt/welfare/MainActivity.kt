@@ -23,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
-import com.ez_docu.ezspluslib.BuildConfig
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
@@ -277,6 +276,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
     private fun registerDownloadReceiver(downloadManager: DownloadManager, activity: MainActivity) {
         var downloadReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -427,8 +427,8 @@ class MainActivity : AppCompatActivity() {
             }
             else{
                 val companyCd = map?.get("COMPANY_CD")
-//                val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
-                val encPwd = map?.get("ENC_PWD")
+                val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
+//                val encPwd = map?.get("ENC_PWD")
                 val osName = "Android"
                 val groupCd = "SK"
                 val osVersion = android.os.Build.VERSION.SDK_INT
@@ -463,6 +463,10 @@ class MainActivity : AppCompatActivity() {
                         else{
                             when(result){
                                 "7000","7001","7005","7008","7009","7015" -> {
+
+                                    FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
+
+
                                     var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
                                     val intent = Intent(actionName)
                                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -470,12 +474,14 @@ class MainActivity : AppCompatActivity() {
                                     startActivityForResult(intent, TOKTOK_REQ_CODE)
                                 }
                                 "3601","3602","3603" -> {
+                                    FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
                                     Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
                                     finishAffinity()
                                     exitProcess(0)
                                 }
                                 "7002","7010","7003","7006","7011","7012" -> {
                                     Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
+                                    FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
                                     val intent = Intent(Intent.ACTION_VIEW)
                                     intent.data = Uri.parse(Constants.storeUrl)
                                     startActivity(intent)
@@ -483,6 +489,7 @@ class MainActivity : AppCompatActivity() {
                                     exitProcess(0)
                                 }
                                 "3205" -> {//인증앱업데이트
+                                    FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
                                     val installUrl = if(isTablet(context)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.toktokAppId}"
                                     else "toktok://com.skt.pe.activity.mobileclient.detail?appId=${Constants.toktokAppId}"
                                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
@@ -711,6 +718,8 @@ fun getAuthKeyCompanyCDEncPwdMDN(context : Context) : Map<String, String>?{
             offset = buffer.indexOf("|", offset + 1)
             if(offset != -1){
                 map.put("COMPANY_CD", buffer.substring(b_offset+1, offset))
+
+
                 map.put("ENC_PWD", URLEncoder.encode(buffer.substring(offset+1), "UTF-8"))
                 map.put("MDN", getMdn(context))
                 return map
