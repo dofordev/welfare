@@ -64,14 +64,25 @@
         android:id="@+id/web_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+
         tools:layout_editor_absoluteX="194dp"
         tools:layout_editor_absoluteY="239dp"
-
+        android:visibility="gone"
         >
 
-
-
     </WebView>
+    <LinearLayout
+        android:id="@+id/splash_view"
+        android:gravity="center"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <pl.droidsonroids.gif.GifImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/splash_img"
+            tools:ignore="MissingConstraints" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

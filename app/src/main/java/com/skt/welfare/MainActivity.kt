@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
-import android.app.ProgressDialog
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -25,19 +24,23 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
+import com.skt.Tmap.TMapTapi
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.io.IOException
 import java.net.NetworkInterface
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.system.exitProcess
 
 
 var splashView: View? = null
@@ -62,9 +65,11 @@ var filePathCallbackLollipop: ValueCallback<Array<Uri>>? = null
 const val FILECHOOSER_REQ_CODE = 2002
 const val TOKTOK_REQ_CODE = 1007
 const val IMAGE_REQ_CODE = 1000
+const val IMAGE_PICK_CODE = 2000
 private var cameraImageUri: Uri? = null
 
 private var authFlag = false
+private var qaFlag = false
 
 
 
@@ -75,25 +80,22 @@ class MainActivity : AppCompatActivity() {
     private var mBackWaitthird:Long = 0
 
 
-    lateinit var webView : WebView;
+    lateinit var webView : WebView
 
-    lateinit var retryBtn : Button;
+    lateinit var retryBtn : Button
 
 
-    private var downloadId:Long = 0;
+    private var downloadId:Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        context = this;
+        context = this
 //        splashView = findViewById(R.id.view)
 
+
 //        val mWebView : WebView = findViewById(R.id.web_view)
-
-
-
-        authFlag = false
 
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
         var toktokPackagename = if(isTablet(context)) Constants.toktokTabletPackageName else Constants.toktokPhonePackageName
@@ -101,31 +103,36 @@ class MainActivity : AppCompatActivity() {
         i.data = Uri.parse(Constants.storeUrl)
 
 
+        Constants.tmaptapi = TMapTapi(this)
+        Constants.tmaptapi?.setSKTMapAuthentication(Constants.tmapApiKey)
 
-
-        //스토어 설치 체크
-        if(!checkInstallationOf(context, storePackagename)) {
-            startActivity(i)
-            finish()
+        if(!qaFlag){
+            //스토어 설치 체크
+            if(!checkInstallationOf(context, storePackagename)) {
+                startActivity(i)
+                finishAffinity()
+                exitProcess(0)
+            }
+            //톡톡 설치 체크
+            else if(!checkInstallationOf(context, toktokPackagename)) {
+                startActivity(i)
+                finishAffinity()
+                exitProcess(0)
+            }
         }
-        //톡톡 설치 체크
-        else if(!checkInstallationOf(context, toktokPackagename)) {
-            startActivity(i)
-            finish()
-        }
-
-
-
-
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
+            if(!qaFlag) {
+                Constants.loginInfo = TokTokResponse(deviceToken = task.result.toString())
 
+            }
+            else{
 
-
+                FirebaseCrashlytics.getInstance().setUserId("01103901")
 
                 Constants.loginInfo = TokTokResponse(
                     deviceToken = task.result.toString()
@@ -135,16 +142,17 @@ class MainActivity : AppCompatActivity() {
                     , empId = "01103901"
                     , loginId = "SKT.01103901"
                     , primitive = "COMMON_COMMON_EMPINFO"
+                    , mblTypCd = "A"
                 )
 
-
+            }
 
         })
-
 
         mWebView = findViewById(R.id.web_view)
         webView = findViewById(R.id.web_view)
         wrap_content = findViewById(R.id.wrap_content)
+        splashView = findViewById(R.id.splash_view)
 
         retryBtn = findViewById(R.id.retry_btn)
 
@@ -166,7 +174,8 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(context, Constants.appCloseWaitText, Toast.LENGTH_SHORT).show()
                     } else {
                         //액티비티 종료
-                        finish()
+                            finishAffinity()
+                        exitProcess(0)
                     }
                 }
 
@@ -222,8 +231,9 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        if(BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true);
 
+
+//        WebView.setWebContentsDebuggingEnabled(true)
 
 
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
@@ -236,8 +246,7 @@ class MainActivity : AppCompatActivity() {
         mWebSettings.builtInZoomControls = false // 화면 확대 축소 허용 여부
         mWebSettings.cacheMode = WebSettings.LOAD_NO_CACHE // 브라우저 캐시 허용 여부
         mWebSettings.domStorageEnabled = true // 로컬저장소 허용 여부
-        mWebSettings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // 브라우저 캐시 허용 여부
-        mWebSettings.domStorageEnabled = true
+        mWebSettings.setAppCacheEnabled(false)
 
 
 
@@ -247,7 +256,7 @@ class MainActivity : AppCompatActivity() {
             val storagePermission = checkPermission(STORAGE_PERMISSION, FLAG_PERMISSION_STORAGE)
             if(storagePermission) {
                 val phonePermission = checkPermission(PHONE_PERMISSION, FLAG_PERMISSION_PHONE)
-                if(phonePermission) goMain(Constants.baseUrl)
+                if(phonePermission) toktokApi()
             }
         }
 
@@ -267,6 +276,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
     private fun registerDownloadReceiver(downloadManager: DownloadManager, activity: MainActivity) {
         var downloadReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -297,8 +307,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun goMain(url: String){
-//        authFlag = true
+    fun goMain(){
 
         if(!authFlag){
             var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
@@ -309,12 +318,10 @@ class MainActivity : AppCompatActivity() {
         else{
             mWebView.run {
                 webViewClient = CustomWebViewClient()
-                loadUrl(url + "?t=" + System.currentTimeMillis())
+                clearCache(true)
+                loadUrl(Constants.baseUrl + "?t=" + System.currentTimeMillis())
             }
         }
-
-
-
     }
     fun View.hideKeyboard() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -329,7 +336,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 if(back_cnt >= 3){
                     Toast.makeText(context, Constants.appCloseText, Toast.LENGTH_SHORT).show()
-                    finish()
+                    finishAffinity()
+                    exitProcess(0)
                 }
             }
             mBackWaitthird = System.currentTimeMillis()
@@ -342,7 +350,8 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(context, Constants.appCloseWaitText, Toast.LENGTH_SHORT).show()
             } else {
                 //액티비티 종료
-                finish()
+                finishAffinity()
+                exitProcess(0)
             }
 
         }
@@ -361,7 +370,8 @@ class MainActivity : AppCompatActivity() {
                 for (grant in grantResults) {
                     if (grant != PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, Constants.cameraPermissionText, Toast.LENGTH_LONG).show()
-                        finish()
+                        finishAffinity()
+                        exitProcess(0)
                     } else {
                         checkPermission(STORAGE_PERMISSION, FLAG_PERMISSION_STORAGE)
                     }
@@ -371,7 +381,8 @@ class MainActivity : AppCompatActivity() {
                 for (grant in grantResults) {
                     if (grant != PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, Constants.storagePermissionText, Toast.LENGTH_LONG).show()
-                        finish()
+                        finishAffinity()
+                        exitProcess(0)
                     } else {
                         checkPermission(PHONE_PERMISSION, FLAG_PERMISSION_PHONE)
                     }
@@ -381,9 +392,10 @@ class MainActivity : AppCompatActivity() {
                 for (grant in grantResults) {
                     if (grant != PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, Constants.phonePermissionText, Toast.LENGTH_LONG).show()
-                        finish()
+                        finishAffinity()
+                        exitProcess(0)
                     } else {
-                        goMain(Constants.baseUrl)
+                        toktokApi()
                     }
                 }
             }
@@ -402,6 +414,111 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    fun toktokApi(){
+        if(qaFlag){
+            authFlag = true
+            goMain()
+        }
+        else{
+            val map = getAuthKeyCompanyCDEncPwdMDN(context)
+
+            if( map == null){
+                goMain()
+            }
+            else{
+                val companyCd = map?.get("COMPANY_CD")
+                val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
+//                val encPwd = map?.get("ENC_PWD")
+                val osName = "Android"
+                val groupCd = "SK"
+                val osVersion = android.os.Build.VERSION.SDK_INT
+                val authKey = map?.get("AUTHKEY")
+                val mdn = map?.get("MDN")
+                val appId = Constants.toktokAppId
+                val appVer = BuildConfig.VERSION_NAME
+                val lang = Locale.getDefault().language
+                val api = TokTokApi.create()
+
+                api.auth("COMMON_COMMON_EMPINFO",companyCd,appId, appVer, encPwd, osName,groupCd,lang,authKey,osVersion, mdn).enqueue(object :
+                    Callback<TokTokResponse> {
+                    override fun onResponse(
+                        call: Call<TokTokResponse>,
+                        response: Response<TokTokResponse>
+                    ) {
+
+                        Constants.loginInfo = response.body()?.copy(
+                            deviceToken = Constants.loginInfo!!.deviceToken,
+                            mblTypCd = "A"
+                        )
+                        response.body()?.empId?.let { FirebaseCrashlytics.getInstance().setUserId(it) }
+
+                        val email = response.body()?.email
+                        val result = response.body()?.result
+                        val resultMessage = response.body()?.resultMessage
+                        if(result.equals("1000")){
+                            authFlag = true
+                            goMain()
+
+                        }
+                        else{
+                            when(result){
+                                "7000","7001","7005","7008","7009","7015" -> {
+
+                                    FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
+
+
+                                    var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
+                                    val intent = Intent(actionName)
+                                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                    Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
+                                    startActivityForResult(intent, TOKTOK_REQ_CODE)
+                                }
+                                "3601","3602","3603" -> {
+                                    FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
+                                    Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
+                                    finishAffinity()
+                                    exitProcess(0)
+                                }
+                                "7002","7010","7003","7006","7011","7012" -> {
+                                    Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
+                                    FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
+                                    val intent = Intent(Intent.ACTION_VIEW)
+                                    intent.data = Uri.parse(Constants.storeUrl)
+                                    startActivity(intent)
+                                    finishAffinity()
+                                    exitProcess(0)
+                                }
+                                "3205" -> {//인증앱업데이트
+                                    FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
+                                    val installUrl = if(isTablet(context)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.toktokAppId}"
+                                    else "toktok://com.skt.pe.activity.mobileclient.detail?appId=${Constants.toktokAppId}"
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
+                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_NO_HISTORY
+                                    startActivity(intent)
+                                    finishAffinity()
+                                    exitProcess(0)
+                                }
+                                else -> {
+                                    Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
+                                    finishAffinity()
+                                    exitProcess(0)
+                                }
+                            }
+                        }
+                    }
+                    override fun onFailure(call: Call<TokTokResponse>, t: Throwable) {
+                        Log.e(TAG, t.stackTraceToString())
+                        Toast.makeText(context, t.stackTraceToString(), Toast.LENGTH_SHORT).show()
+                        finishAffinity()
+                        exitProcess(0)
+                    }
+                })
+            }
+        }
+
+
+
+    }
     fun makeDir(){
 //        val filePath = Environment.getExternalStorageDirectory().absolutePath + "/" + Constants.ocrImgFolder
 //        if (!File(filePath).exists()) {
@@ -488,88 +605,27 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         var data = data
+
         when (requestCode) {
 
             TOKTOK_REQ_CODE -> if (resultCode == RESULT_OK) {
-                val map = getAuthKeyCompanyCDEncPwdMDN(context)
-                val companyCd = map?.get("COMPANY_CD")
-                val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
-                val osName = "Android"
-                val groupCd = "SK"
-                val osVersion = android.os.Build.VERSION.SDK_INT
-                val authKey = map?.get("AUTHKEY")
-                val mdn = map?.get("MDN")
-                val appId = Constants.toktokAppId
-                val appVer = BuildConfig.VERSION_NAME
-                val lang = Locale.getDefault().language
-
-
-                val api = TokTokApi.create()
-                api.auth("COMMON_COMMON_EMPINFO",companyCd,appId, appVer, encPwd, osName,groupCd,lang,authKey,osVersion, mdn).enqueue(object :
-                    Callback<TokTokResponse> {
-                        override fun onResponse(
-                            call: Call<TokTokResponse>,
-                            response: Response<TokTokResponse>
-                        ) {
-
-
-                            Constants.loginInfo = response.body()?.copy(
-                                deviceToken = Constants.loginInfo!!.deviceToken
-                            )
-
-
-                            val email = response.body()?.email
-                            val result = response.body()?.result
-                            val resultMessage = response.body()?.resultMessage
-                            if(result.equals("1000")){
-                                authFlag = true
-                                goMain(Constants.baseUrl)
-                            }
-                            else{
-                                when(result){
-                                    "7000","7001","7005","7008","7009","7015" -> {
-                                        var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
-                                        val intent = Intent(actionName)
-                                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                        Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                        startActivityForResult(intent, TOKTOK_REQ_CODE)
-                                    }
-                                    "3601","3602","3603" -> {
-                                        Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                        finish()
-                                    }
-                                    "7002","7010","7003","7006","7011","7012" -> {
-                                        Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                        val intent = Intent(Intent.ACTION_VIEW)
-                                        intent.data = Uri.parse(Constants.storeUrl)
-                                        startActivity(intent)
-                                        finish()
-                                    }
-                                    "3205" -> {//인증앱업데이트
-                                        val installUrl = if(isTablet(context)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.toktokAppId}"
-                                        else "toktok://com.skt.pe.activity.mobileclient.detail?appId=${Constants.toktokAppId}"
-                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
-                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_NO_HISTORY
-                                        startActivity(intent)
-                                        finish()
-                                    }
-                                    else -> {
-                                        Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
-                                        finish()
-                                    }
-                                }
-                            }
-                        }
-                        override fun onFailure(call: Call<TokTokResponse>, t: Throwable) {
-                            Log.e(TAG, t.stackTraceToString())
-                            Toast.makeText(context, t.stackTraceToString(), Toast.LENGTH_SHORT).show()
-                            finish()
-                        }
-                })
-
+                toktokApi()
             }
+
             IMAGE_REQ_CODE -> if (resultCode == RESULT_OK) {
 
+            }
+            IMAGE_PICK_CODE -> if (resultCode == RESULT_OK) {
+                Log.e("IMAGE==" , "asd" )
+                val uri = data!!.data
+                try {
+                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+
+                    Constants.sendImage(data.getStringExtra("callbackFnName"), context, data.getStringExtra("apiPath"), bitmap!!)
+
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
             FILECHOOSER_REQ_CODE -> if (resultCode == RESULT_OK) {
                 if (filePathCallbackLollipop == null) return
@@ -649,8 +705,9 @@ fun getAuthKeyCompanyCDEncPwdMDN(context : Context) : Map<String, String>?{
         val uri = cr.insert(Uri.parse("content://com.skt.pe.auth/GMP_AUTH_PWD"), values)
         val authValues = uri!!.pathSegments
         val returnId = authValues.get(1)
+
         if("E001".equals(returnId) || "E002".equals(returnId) || "E007".equals(returnId) || "E008".equals(returnId)){
-            throw Exception("Auth Exception")
+            return null
         }
         val buffer = authValues.get(2)
         var b_offset = 0
@@ -661,6 +718,8 @@ fun getAuthKeyCompanyCDEncPwdMDN(context : Context) : Map<String, String>?{
             offset = buffer.indexOf("|", offset + 1)
             if(offset != -1){
                 map.put("COMPANY_CD", buffer.substring(b_offset+1, offset))
+
+
                 map.put("ENC_PWD", URLEncoder.encode(buffer.substring(offset+1), "UTF-8"))
                 map.put("MDN", getMdn(context))
                 return map
@@ -681,45 +740,53 @@ fun getMdn(context: Context) : String{
     var mdn = ""
     val cr = context.contentResolver
     if(isTablet(context)){//테블릿
-        val uri = cr.insert(Uri.parse("content://com.skt.pe.auth/MACADDR"), ContentValues())
-        val authValues= uri!!.pathSegments
-        if(authValues.size > 0){
-            mdn = authValues.get(2).toUpperCase()
-        }
-        else{
-            val all = Collections.list(NetworkInterface.getNetworkInterfaces())
-            for(nif in  all){
-                if(!nif.name.equals("wlan0", ignoreCase = true)) continue
-
-                val macBytes = nif.hardwareAddress
-
-                if (macBytes == null){
-                    mdn = ""
-                }
-                val res1 = StringBuffer()
-                for(b in macBytes){
-                    res1.append(Integer.toHexString(b.toInt() and 0xFF) + ":")
-                }
-                if(res1.length >0){
-                    res1.deleteCharAt(res1.length -1)
-                }
-                mdn = res1.toString()
+        try{
+            val uri = cr.insert(Uri.parse("content://com.skt.pe.auth/MACADDR"), ContentValues())
+            val authValues= uri!!.pathSegments
+            if(authValues.size > 0){
+                mdn = authValues.get(2).toUpperCase()
             }
+            else{
+                val all = Collections.list(NetworkInterface.getNetworkInterfaces())
+                for(nif in  all){
+                    if(!nif.name.equals("wlan0", ignoreCase = true)) continue
 
+                    val macBytes = nif.hardwareAddress
+
+                    if (macBytes == null){
+                        mdn = ""
+                    }
+                    val res1 = StringBuffer()
+                    for(b in macBytes){
+                        res1.append(Integer.toHexString(b.toInt() and 0xFF) + ":")
+                    }
+                    if(res1.length >0){
+                        res1.deleteCharAt(res1.length -1)
+                    }
+                    mdn = res1.toString()
+                }
+
+            }
         }
+        catch (e : java.lang.Exception){
+            Log.e(TAG, "테블릿 유심없음")
+        }
+
     }
     else{
-
-        val uri = cr.insert(Uri.parse("content://com.skt.pe.auth/MDNCHK"), ContentValues())
-        val authValues= uri!!.pathSegments
-        val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        if(authValues.size > 0){
-            mdn = authValues.get(2)
-        }
-        else{
+        try {
+            val uri = cr.insert(Uri.parse("content://com.skt.pe.auth/MDNCHK"), ContentValues())
+            val authValues = uri!!.pathSegments
             val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            mdn = tm.line1Number
-
+            if (authValues.size > 0) {
+                mdn = authValues.get(2)
+            } else {
+                val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                mdn = tm.line1Number
+            }
+        }
+        catch (e : Exception){
+            Log.e(TAG, "핸드폰 유심없음")
         }
     }
 
@@ -771,7 +838,11 @@ class CustomWebViewClient : WebViewClient() {
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
+        splashView?.visibility = View.GONE
+        mWebView?.visibility = View.VISIBLE
 
+
+        /*
         if(getNetworkConnected()){
             Handler().postDelayed({
 
@@ -790,8 +861,7 @@ class CustomWebViewClient : WebViewClient() {
             msg.data = data
             handler.sendMessage(msg)
         }
-
-
+*/
         super.onPageFinished(view, url)
     }
 
