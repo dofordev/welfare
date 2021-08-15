@@ -423,9 +423,10 @@ class MainActivity : AppCompatActivity() {
             val map = getAuthKeyCompanyCDEncPwdMDN(context)
 
             if( map == null){
+                authFlag = false
                 goMain()
             }
-            else{
+            else if(!authFlag){
                 val companyCd = map?.get("COMPANY_CD")
                 val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
 //                val encPwd = map?.get("ENC_PWD")
@@ -564,6 +565,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         registerNetworkCallback()
+        toktokApi()
     }
 
     override fun onStop() {
@@ -691,7 +693,7 @@ fun getAuthKeyCompanyCDEncPwdMDN(context : Context) : Map<String, String>?{
         val authValues = uri!!.pathSegments
         val returnId = authValues.get(1)
         if("E001".equals(returnId) || "E002".equals(returnId) || "E007".equals(returnId) || "E008".equals(returnId)){
-            throw Exception("Auth Exception")
+            return null
         }
         map.put("AUTHKEY", authValues.get(2))
         map.put("COMPANY_CD", authValues.get(3))
