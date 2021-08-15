@@ -24,6 +24,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.dialog.MaterialDialogs
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
 import com.skt.Tmap.TMapTapi
@@ -70,6 +71,7 @@ private var cameraImageUri: Uri? = null
 
 private var authFlag = false
 private var qaFlag = false
+private var resumeFlag = false
 
 
 
@@ -419,6 +421,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun toktokApi(){
+
+
+        resumeFlag = false
         if(qaFlag){
             authFlag = true
             goMain()
@@ -462,6 +467,7 @@ class MainActivity : AppCompatActivity() {
                         val resultMessage = response.body()?.resultMessage
                         if(result.equals("1000")){
                             authFlag = true
+
                             goMain()
 
                         }
@@ -567,9 +573,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
+        if(resumeFlag) toktokApi()
         super.onResume()
         registerNetworkCallback()
-        toktokApi()
+        resumeFlag = true
     }
 
     override fun onStop() {
