@@ -1,5 +1,6 @@
 package com.skt.welfare.api
 
+import com.skt.welfare.BuildConfig
 import com.skt.welfare.Constants
 import okhttp3.Interceptor
 import okhttp3.MultipartBody
@@ -50,8 +51,12 @@ interface BackendApi {
 
                 .build()
 
+            var backendUrl = Constants.backendPrdUrl
+            if(BuildConfig.FLAVOR.equals("dev")){
+                backendUrl = Constants.backendDevUrl
+            }
             return Retrofit.Builder()
-                .baseUrl(Constants.backendUrl)
+                .baseUrl(backendUrl)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

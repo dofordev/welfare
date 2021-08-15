@@ -316,10 +316,14 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, TOKTOK_REQ_CODE)
         }
         else{
+            var frontdUrl = Constants.frontPrdUrl
+            if(BuildConfig.FLAVOR.equals("dev")){
+                frontdUrl = Constants.frontDevUrl
+            }
             mWebView.run {
                 webViewClient = CustomWebViewClient()
                 clearCache(true)
-                loadUrl(Constants.baseUrl + "?t=" + System.currentTimeMillis())
+                loadUrl(frontdUrl + "?t=" + System.currentTimeMillis())
             }
         }
     }
