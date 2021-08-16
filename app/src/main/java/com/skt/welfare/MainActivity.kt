@@ -27,15 +27,23 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.dialog.MaterialDialogs
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
 import com.skt.Tmap.TMapTapi
+import com.skt.welfare.api.BackendApi
+import com.skt.welfare.api.OcrResponse
 import com.skt.welfare.api.TokTokApi
 import com.skt.welfare.api.TokTokResponse
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.net.NetworkInterface
+import java.net.SocketTimeoutException
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
@@ -420,6 +428,9 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+
+
+
     fun toktokApi(){
 
 
@@ -629,13 +640,12 @@ class MainActivity : AppCompatActivity() {
 
             }
             IMAGE_PICK_CODE -> if (resultCode == RESULT_OK) {
-                Log.e("IMAGE==" , "asd" )
                 val uri = data!!.data
                 try {
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-
-                    Constants.sendImage(data.getStringExtra("callbackFnName"), context, data.getStringExtra("apiPath"), bitmap!!)
-
+                    Handler().postDelayed({
+                        sendImage(data!!.getStringExtra("callbackFnName"), context, data!!.getStringExtra("apiPath"), bitmap!!)
+                    }, 200)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -677,6 +687,9 @@ class MainActivity : AppCompatActivity() {
 
 
 }
+
+
+
 fun isTablet(context: Context): Boolean {
     return context.resources.configuration.smallestScreenWidthDp >= 600
 }
@@ -747,6 +760,80 @@ fun getAuthKeyCompanyCDEncPwdMDN(context : Context) : Map<String, String>?{
     }
 }
 
+
+fun sendImage(callbackFnName : String, context : Context, apiPath : String, bitmap : Bitmap){
+    val webview = (context as MainActivity).webView
+    val callbackFnName = callbackFnName
+    val context = context
+    val apiPath = apiPath
+    try {
+
+        val timeStamp: String = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+        val fileName = "ocr_${timeStamp}.jpeg"
+
+
+        val out = ByteArrayOutputStream()
+
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 50 , out)
+        out.flush()
+        out.close()
+
+        val requestFile: RequestBody =
+            RequestBody.create(MediaType.parse("image/*"), out.toByteArray())
+        val body = MultipartBody.Part.createFormData("mstFile", fileName, requestFile)
+
+
+//            val progress = ProgressDialog(context, R.style.MyTheme)
+//            progress.setCancelable(false) // disable dismiss by tapping outside of the dialog
+//            progress.setProgressStyle(android.R.style.Widget_ProgressBar_Small)
+//            progress.show()
+
+        val progress = LoadingDialog(context)
+        progress.show()
+
+        val api = BackendApi.create()
+        api.postOcrImage(apiPath, body).enqueue(object : Callback<OcrResponse> {
+            override fun onResponse(
+                call: Call<OcrResponse>,
+                response: Response<OcrResponse>
+            ) {
+
+                progress.dismiss()
+                // 성공
+                webview.post(Runnable { webview.evaluateJavascript("${callbackFnName}(${Gson().toJson(response?.body())});", ValueCallback(){}) })
+            }
+
+            override fun onFailure(call: Call<OcrResponse>, t: Throwable) {
+
+                progress.dismiss()
+                val res = OcrResponse(
+                    resultMsg ="응답 없음",
+                    resultCd = 888,
+                    resultMsgTyp = "E",
+                    data = null
+                )
+
+                if (t is SocketTimeoutException || t is IOException) {
+                    webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(res)});")})
+                } else{
+                    // 실패
+                    webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(call)});")})
+                }
+
+            }
+        })
+    } catch (e: Exception) {
+        val res = OcrResponse(
+            resultMsg ="알수 없는 에러",
+            resultCd = 999,
+            resultMsgTyp = "E",
+            data = null
+        )
+
+        // 실패
+        webview.post(Runnable { webview.loadUrl("javascript:${callbackFnName}(${Gson().toJson(res)});") })
+    }
+}
 
 @SuppressLint("MissingPermission")
 fun getMdn(context: Context) : String{

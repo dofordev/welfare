@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Handler
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
@@ -183,7 +184,11 @@ class OcrCallback(callbackFnName : String, context : Context, apiPath : String) 
         executeResult?.deskew?.bitmapBytes()
         val bitmap  = executeResult?.deskew?.toBitmap()//executeResult?.original?.toBitmap()
 
-        Constants.sendImage(callbackFnName, context, apiPath, bitmap!!)
+        Handler().postDelayed({
+            sendImage(callbackFnName, context, apiPath, bitmap!!)
+        }, 200)
+
+
 
     }
 
