@@ -52,7 +52,7 @@ interface TokTokApi {
                 .build()
 
             var url = Constants.toktokPrdUrl;
-            if(BuildConfig.FLAVOR.equals("dev")){
+            if(BuildConfig.FLAVOR == "dev"){
                 url = Constants.toktokDevUrl
             }
 

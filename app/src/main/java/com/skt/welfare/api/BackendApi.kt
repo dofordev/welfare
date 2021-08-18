@@ -52,7 +52,7 @@ interface BackendApi {
                 .build()
 
             var backendUrl = Constants.backendPrdUrl
-            if(BuildConfig.FLAVOR.equals("dev")){
+            if(BuildConfig.FLAVOR == "dev"){
                 backendUrl = Constants.backendDevUrl
             }
             return Retrofit.Builder()

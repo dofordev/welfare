@@ -38,7 +38,7 @@ android {
                 def name = parent.project.getName()
                 def buildType = variant.buildType.name
                 def versionName = variant.versionName
-                outputFileName = "${name}-${buildType}-${versionName}.apk"
+                outputFileName = "${name}-${versionName}.apk"
             }
         }
 

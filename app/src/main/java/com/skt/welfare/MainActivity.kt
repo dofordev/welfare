@@ -6,6 +6,7 @@ import android.app.Activity
 import android.app.DownloadManager
 import android.content.*
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.net.*
 import android.os.*
@@ -76,10 +77,9 @@ const val TOKTOK_REQ_CODE = 1007
 const val IMAGE_REQ_CODE = 1000
 const val IMAGE_PICK_CODE = 2000
 private var cameraImageUri: Uri? = null
-
+private var permissionFlag = false
 private var authFlag = false
 private var qaFlag = false
-private var resumeFlag = false
 
 
 
@@ -102,11 +102,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         context = this
-//        splashView = findViewById(R.id.view)
 
 
-//        val mWebView : WebView = findViewById(R.id.web_view)
-
+        if(BuildConfig.FLAVOR == "dev"){
+            WebView.setWebContentsDebuggingEnabled(true)
+        }
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
         var toktokPackagename = if(isTablet(context)) Constants.toktokTabletPackageName else Constants.toktokPhonePackageName
         val i = Intent(Intent.ACTION_VIEW)
@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         mWebView.webViewClient = WebViewClient()// 클릭시 새창 안뜨게
         mWebView.addJavascriptInterface(Bridge(this), Constants.javascriptBridgeName); // 자바스크립트 브릿지 연결
         if(Build.VERSION.SDK_INT >= 21) {//http 이미지 허용
-            mWebView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+            mWebView.settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW;
         }
         mWebView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(message: String, lineNumber: Int, sourceID: String) {
@@ -243,7 +243,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-//        WebView.setWebContentsDebuggingEnabled(true)
 
 
         val mWebSettings : WebSettings = mWebView.settings //세부 세팅 등록
@@ -266,7 +265,10 @@ class MainActivity : AppCompatActivity() {
             val storagePermission = checkPermission(STORAGE_PERMISSION, FLAG_PERMISSION_STORAGE)
             if(storagePermission) {
                 val phonePermission = checkPermission(PHONE_PERMISSION, FLAG_PERMISSION_PHONE)
-                if(phonePermission) toktokApi()
+                if(phonePermission) {
+                    permissionFlag = true
+                    toktokApi()
+                }
             }
         }
 
@@ -327,7 +329,7 @@ class MainActivity : AppCompatActivity() {
         }
         else{
             var frontdUrl = Constants.frontPrdUrl
-            if(BuildConfig.FLAVOR.equals("dev")){
+            if(BuildConfig.FLAVOR == "dev"){
                 frontdUrl = Constants.frontDevUrl
             }
             mWebView.run {
@@ -409,6 +411,7 @@ class MainActivity : AppCompatActivity() {
                         finishAffinity()
                         exitProcess(0)
                     } else {
+                        permissionFlag = true
                         toktokApi()
                     }
                 }
@@ -433,15 +436,12 @@ class MainActivity : AppCompatActivity() {
 
     fun toktokApi(){
 
-
-        resumeFlag = false
         if(qaFlag){
             authFlag = true
             goMain()
         }
         else{
             val map = getAuthKeyCompanyCDEncPwdMDN(context)
-
             if( map == null){
                 authFlag = false
                 goMain()
@@ -478,15 +478,14 @@ class MainActivity : AppCompatActivity() {
                         val resultMessage = response.body()?.resultMessage
                         if(result.equals("1000")){
                             authFlag = true
-
                             goMain()
-
                         }
                         else{
                             when(result){
                                 "7000","7001","7005","7008","7009","7015" -> {
 
                                     FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
+                                    Log.d("TEST==", "$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
 
 
                                     var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
@@ -496,6 +495,8 @@ class MainActivity : AppCompatActivity() {
                                     startActivityForResult(intent, TOKTOK_REQ_CODE)
                                 }
                                 "3601","3602","3603" -> {
+                                    Log.d("TEST==2", "$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
+
                                     FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
                                     Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
                                     finishAffinity()
@@ -510,8 +511,8 @@ class MainActivity : AppCompatActivity() {
                                     finishAffinity()
                                     exitProcess(0)
                                 }
-                                "3205" -> {//인증앱업데이트
-                                    FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
+                                "3205" -> {//앱업데이트
+
                                     val installUrl = if(isTablet(context)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.toktokAppId}"
                                     else "toktok://com.skt.pe.activity.mobileclient.detail?appId=${Constants.toktokAppId}"
                                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
@@ -584,10 +585,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        if(resumeFlag) toktokApi()
+        if(!qaFlag && permissionFlag) toktokApi()
         super.onResume()
         registerNetworkCallback()
-        resumeFlag = true
+    }
+
+//    override fun onRestart() {
+//        super.onRestart()
+//    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
     }
 
     override fun onStop() {
@@ -938,8 +946,12 @@ class CustomWebViewClient : WebViewClient() {
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
-        splashView?.visibility = View.GONE
-        mWebView?.visibility = View.VISIBLE
+        Handler().postDelayed({
+            splashView?.visibility = View.GONE
+            mWebView?.visibility = View.VISIBLE
+                              }, 200)
+
+
 
 
         /*
@@ -988,6 +1000,7 @@ class CustomWebViewClient : WebViewClient() {
         view: WebView?,
         request: WebResourceRequest?
     ): Boolean {
+
         return super.shouldOverrideUrlLoading(view, request)
     }
 }
