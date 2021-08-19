@@ -3,6 +3,7 @@ package com.skt.welfare
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DownloadManager
 import android.content.*
 import android.content.pm.PackageManager
@@ -130,6 +131,7 @@ class MainActivity : AppCompatActivity() {
                 exitProcess(0)
             }
         }
+
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -513,13 +515,8 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 "3205" -> {//앱업데이트
 
-                                    val installUrl = if(isTablet(context)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.toktokAppId}"
-                                    else "toktok://com.skt.pe.activity.mobileclient.detail?appId=${Constants.toktokAppId}"
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
-                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_NO_HISTORY
-                                    startActivity(intent)
-                                    finishAffinity()
-                                    exitProcess(0)
+                                    updateDialog()
+
                                 }
                                 else -> {
                                     Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
@@ -696,7 +693,23 @@ class MainActivity : AppCompatActivity() {
 
 }
 
+fun updateDialog(){
+    var builder = AlertDialog.Builder(context)
+    builder.setTitle("알림")
+    builder.setMessage("최신 버전으로 업데이트해 주세요.")
 
+    var listener = DialogInterface.OnClickListener { p0, p1 ->
+        val installUrl = if(isTablet(context)) "toktok://com.sk.tablet.group.store.detail?appId=${Constants.toktokAppId}"
+        else "toktok://com.skt.pe.activity.mobileclient.detail?appId=${Constants.toktokAppId}"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(installUrl))
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_NO_HISTORY
+        (context as MainActivity).startActivity(intent)
+        (context as MainActivity).finishAffinity()
+        exitProcess(0)
+    }
+    builder.setPositiveButton("스토어 가기", listener)
+    builder.show()
+}
 
 fun isTablet(context: Context): Boolean {
     return context.resources.configuration.smallestScreenWidthDp >= 600
@@ -782,7 +795,7 @@ fun sendImage(callbackFnName : String, context : Context, apiPath : String, bitm
 
         val out = ByteArrayOutputStream()
 
-        bitmap?.compress(Bitmap.CompressFormat.JPEG, 50 , out)
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100 , out)
         out.flush()
         out.close()
 
