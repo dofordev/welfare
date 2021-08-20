@@ -14,25 +14,35 @@ android {
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
     }
 
-    buildTypes {
+    signingConfigs {
+        debug {
+            storeFile file("${rootProject.projectDir}/app/debug.keystore")
+            storePassword('android')
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
         }
+    }
+    buildTypes {
         debug {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
         }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
+        }
         applicationVariants.all {
             variant -> variant.outputs.all {
                 def name = parent.project.getName()
