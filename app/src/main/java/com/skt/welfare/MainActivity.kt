@@ -334,6 +334,9 @@ class MainActivity : AppCompatActivity() {
             if(BuildConfig.FLAVOR == "dev"){
                 frontdUrl = Constants.frontDevUrl
             }
+            else if(BuildConfig.FLAVOR == "stg") {
+                frontdUrl = Constants.frontStgUrl
+            }
             mWebView.run {
                 webViewClient = CustomWebViewClient()
                 clearCache(true)

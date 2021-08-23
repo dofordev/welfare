@@ -24,11 +24,11 @@ import java.util.*
 object Constants {
     val frontDevUrl = "http://welfaredevm.sktelecom.com:50000"
     val frontPrdUrl = "https://welfarem.sktelecom.com:50443"
-//    val frontPrdUrl = "http://welfaredevm.sktelecom.com:50000"
+    val frontStgUrl = "http://welfaredevm.sktelecom.com:50000"
 
     val backendDevUrl = "http://welfaredevm.sktelecom.com:50001"
     val backendPrdUrl = "https://welfarem.sktelecom.com:58443"
-//    val backendPrdUrl = "http://welfaredevm.sktelecom.com:50001"
+    val backendStgUrl = "http://welfaredevm.sktelecom.com:50001"
 
     val appCloseWaitText = "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다."
     val appCloseText = "앱이 종료됩니다."
@@ -50,6 +50,7 @@ object Constants {
 
     val toktokAppId = "Z000ST0057"
     val toktokDevUrl = "https://devgmp.sktelecom.com:9443"
+    val toktokStgUrl = "https://m.toktok.sk.com:9443"
     val toktokPrdUrl = "https://m.toktok.sk.com:9443"
 
     val toktokStorePhonePackageName = "com.skt.pe.activity.mobileclient"

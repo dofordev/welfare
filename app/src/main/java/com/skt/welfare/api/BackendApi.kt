@@ -55,6 +55,9 @@ interface BackendApi {
             if(BuildConfig.FLAVOR == "dev"){
                 backendUrl = Constants.backendDevUrl
             }
+            else if(BuildConfig.FLAVOR == "stg"){
+                backendUrl = Constants.backendStgUrl
+            }
             return Retrofit.Builder()
                 .baseUrl(backendUrl)
                 .client(client)

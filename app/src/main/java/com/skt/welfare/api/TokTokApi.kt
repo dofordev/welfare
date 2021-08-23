@@ -55,8 +55,12 @@ interface TokTokApi {
             if(BuildConfig.FLAVOR == "dev"){
                 url = Constants.toktokDevUrl
             }
+            else if(BuildConfig.FLAVOR == "stg"){
+                url = Constants.toktokStgUrl
+            }
 
-            return Retrofit.Builder()
+
+                return Retrofit.Builder()
                 .baseUrl(url)
                 .client(client)
                 .addConverterFactory(TikXmlConverterFactory.create(TikXml.Builder().exceptionOnUnreadXml(false).build()))

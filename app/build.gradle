@@ -59,6 +59,10 @@ android {
             dimension "version"
             versionNameSuffix "-dev"
         }
+        stg {
+            dimension "version"
+            versionNameSuffix "-stg"
+        }
         prd {
             dimension "version"
             versionNameSuffix "-prd"
