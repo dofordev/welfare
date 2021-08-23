@@ -649,7 +649,7 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
                     Handler().postDelayed({
-                        sendImage(data!!.getStringExtra("callbackFnName"), context, data!!.getStringExtra("apiPath"), bitmap!!)
+                        sendImage(intent.getStringExtra("callbackFnName"), context, intent.getStringExtra("apiPath"), bitmap!!)
                     }, 200)
                 } catch (e: IOException) {
                     e.printStackTrace()

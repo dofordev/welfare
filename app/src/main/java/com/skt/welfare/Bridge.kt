@@ -86,8 +86,11 @@ class Bridge(private val mContext: Context){
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
-        intent.putExtra("callbackFnName",callbackFnName)
-        intent.putExtra("apiPath",apiPath)
+
+        (mContext as MainActivity).intent.putExtra("callbackFnName",callbackFnName)
+        (mContext as MainActivity).intent.putExtra("apiPath",apiPath)
+//        intent.putExtra("callbackFnName",callbackFnName)
+//        intent.putExtra("apiPath",apiPath)
         (mContext as MainActivity).startActivityForResult(Intent.createChooser(intent, ""), IMAGE_PICK_CODE)
     }
 
