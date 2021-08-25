@@ -64,7 +64,8 @@ object Constants {
     val vacationPackageName = "com.gmp.skt.dywt.mobile"
     val vacationAppId = "Z000ST0049";
 
-    val storeUrl = "https://m.toktok.sk.com/fordev.jsp"
+    val storeDevUrl = "https://m.toktok.sk.com/fordev.jsp"
+    val storePrdUrl = "https://m.toktok.sk.com"
 
     var phoneNumber = ""
 
