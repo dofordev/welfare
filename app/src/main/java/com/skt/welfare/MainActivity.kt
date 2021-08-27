@@ -715,7 +715,8 @@ fun updateDialog(){
 }
 
 fun isTablet(context: Context): Boolean {
-    return context.resources.configuration.smallestScreenWidthDp >= 600
+    return false
+//    return context.resources.configuration.smallestScreenWidthDp >= 600
 }
 //앱설치 체크
 fun checkInstallationOf(context : Context, packagename : String) : Boolean{
