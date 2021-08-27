@@ -111,7 +111,11 @@ class MainActivity : AppCompatActivity() {
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
         var toktokPackagename = if(isTablet(context)) Constants.toktokTabletPackageName else Constants.toktokPhonePackageName
         val i = Intent(Intent.ACTION_VIEW)
-        i.data = Uri.parse(Constants.storeUrl)
+        var storeUrl = Constants.storePrdUrl
+        if(BuildConfig.FLAVOR == "dev"){
+            storeUrl = Constants.storeDevUrl
+        }
+        i.data = Uri.parse(storeUrl)
 
 
         Constants.tmaptapi = TMapTapi(this)
@@ -511,7 +515,12 @@ class MainActivity : AppCompatActivity() {
                                     Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
                                     FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
                                     val intent = Intent(Intent.ACTION_VIEW)
-                                    intent.data = Uri.parse(Constants.storeUrl)
+
+                                    var storeUrl = Constants.storePrdUrl
+                                    if(BuildConfig.FLAVOR == "dev"){
+                                        storeUrl = Constants.storeDevUrl
+                                    }
+                                    intent.data = Uri.parse(storeUrl)
                                     startActivity(intent)
                                     finishAffinity()
                                     exitProcess(0)
