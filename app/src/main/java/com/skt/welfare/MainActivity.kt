@@ -564,6 +564,9 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
             }
+            else{
+                goMain()
+            }
         }
 
 
