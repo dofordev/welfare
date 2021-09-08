@@ -52,6 +52,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.system.exitProcess
+import android.os.Bundle
+
+import android.content.Intent
+
+
+
 
 
 var splashView: View? = null
@@ -103,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         context = this
-
+        Log.d(TAG, "onCreate")
 
         if(BuildConfig.FLAVOR == "dev"){
             WebView.setWebContentsDebuggingEnabled(true)
@@ -334,17 +340,28 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, TOKTOK_REQ_CODE)
         }
         else{
-            var frontdUrl = Constants.frontPrdUrl
+            Constants.frontUrl = Constants.frontPrdUrl
             if(BuildConfig.FLAVOR == "dev"){
-                frontdUrl = Constants.frontDevUrl
+                Constants.frontUrl = Constants.frontDevUrl
             }
             else if(BuildConfig.FLAVOR == "stg") {
-                frontdUrl = Constants.frontStgUrl
+                Constants.frontUrl = Constants.frontStgUrl
+            }
+
+            var pushUrl = Constants.frontUrl
+            val intent = intent
+            val bundle = intent.extras
+            if (bundle != null) {
+                if (bundle.getString("pushUrl") != null && !bundle.getString("pushUrl")
+                        .equals("", ignoreCase = true)
+                ) {
+                    pushUrl = bundle.get("pushUrl") as String
+                }
             }
             mWebView.run {
                 webViewClient = CustomWebViewClient()
                 clearCache(true)
-                loadUrl(frontdUrl + "?t=" + System.currentTimeMillis())
+                loadUrl(pushUrl + "?t=" + System.currentTimeMillis())
             }
         }
     }

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -30,11 +31,12 @@ class FireBaseMessagingService : FirebaseMessagingService() {
 
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.data)
+            Log.d(TAG, "Message data payload: " + remoteMessage.data.toString())
             sendNotification(
                 remoteMessage.data["title"], remoteMessage.data["message"]
             )
         } else if (remoteMessage.notification != null) {
+            Log.d(TAG, "Message data default: " + remoteMessage.data.toString())
             sendNotification(
                 remoteMessage.notification!!.title, remoteMessage.notification!!.body
             )
@@ -46,6 +48,17 @@ class FireBaseMessagingService : FirebaseMessagingService() {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent.setClass(this, MainActivity::class.java)
+
+        Constants.frontUrl = Constants.frontPrdUrl
+        if(BuildConfig.FLAVOR == "dev"){
+            Constants.frontUrl = Constants.frontDevUrl
+        }
+        else if(BuildConfig.FLAVOR == "stg") {
+            Constants.frontUrl = Constants.frontStgUrl
+        }
+        val bundle = Bundle()
+        bundle.putString("pushUrl", Constants.frontUrl + "/#/ann")
+        intent.putExtras(bundle)
         val pendingIntent = PendingIntent.getActivity(
             this, 0 /* Request code */, intent,
             PendingIntent.FLAG_ONE_SHOT

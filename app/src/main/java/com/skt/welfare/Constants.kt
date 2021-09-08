@@ -26,6 +26,8 @@ object Constants {
     val frontPrdUrl = "https://welfarem.sktelecom.com:50443"
     val frontStgUrl = "http://welfaredevm.sktelecom.com:50000"
 
+    var frontUrl = ""
+
     val backendDevUrl = "http://welfaredevm.sktelecom.com:50001"
     val backendPrdUrl = "https://welfarem.sktelecom.com:58443"
     val backendStgUrl = "http://welfaredevm.sktelecom.com:50001"
