@@ -474,7 +474,7 @@ class MainActivity : AppCompatActivity() {
                 authFlag = false
                 goMain()
             }
-            else if(!authFlag){
+            else{
                 val companyCd = map?.get("COMPANY_CD")
                 val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
 //                val encPwd = map?.get("ENC_PWD")
@@ -563,9 +563,6 @@ class MainActivity : AppCompatActivity() {
                         exitProcess(0)
                     }
                 })
-            }
-            else{
-                goMain()
             }
         }
 
