@@ -148,9 +148,10 @@ class MainActivity : AppCompatActivity() {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
+            Log.d(TAG, "Token : " + task.result.toString())
+
             if(!qaFlag) {
                 Constants.loginInfo = TokTokResponse(deviceToken = task.result.toString())
-
             }
             else{
 
@@ -468,6 +469,7 @@ class MainActivity : AppCompatActivity() {
         }
         else{
             val map = getAuthKeyCompanyCDEncPwdMDN(context)
+
             if( map == null){
                 authFlag = false
                 goMain()
@@ -502,6 +504,7 @@ class MainActivity : AppCompatActivity() {
                         val email = response.body()?.email
                         val result = response.body()?.result
                         val resultMessage = response.body()?.resultMessage
+
                         if(result.equals("1000")){
                             authFlag = true
                             goMain()
@@ -511,7 +514,6 @@ class MainActivity : AppCompatActivity() {
                                 "7000","7001","7005","7008","7009","7015" -> {
 
                                     FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
-                                    Log.d("TEST==", "$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
 
 
                                     var actionName = if(isTablet(context)) Constants.toktokTabletActionName else Constants.toktokPhoneActionName
@@ -521,7 +523,6 @@ class MainActivity : AppCompatActivity() {
                                     startActivityForResult(intent, TOKTOK_REQ_CODE)
                                 }
                                 "3601","3602","3603" -> {
-                                    Log.d("TEST==2", "$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
 
                                     FirebaseCrashlytics.getInstance().log("$result==$companyCd==$appId==$appVer==$encPwd==$lang==$authKey==$osVersion==$mdn")
                                     Toast.makeText(context, "${result}-${resultMessage}", Toast.LENGTH_SHORT).show()
@@ -562,6 +563,9 @@ class MainActivity : AppCompatActivity() {
                         exitProcess(0)
                     }
                 })
+            }
+            else{
+                goMain()
             }
         }
 
@@ -989,6 +993,9 @@ class CustomWebViewClient : WebViewClient() {
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
+
+
+
         Handler().postDelayed({
             splashView?.visibility = View.GONE
             mWebView?.visibility = View.VISIBLE
