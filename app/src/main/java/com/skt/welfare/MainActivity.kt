@@ -85,9 +85,9 @@ const val IMAGE_REQ_CODE = 1000
 const val IMAGE_PICK_CODE = 2000
 private var cameraImageUri: Uri? = null
 private var permissionFlag = false
+private var appStartFlag = false
 private var authFlag = false
 private var qaFlag = false
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -356,14 +356,19 @@ class MainActivity : AppCompatActivity() {
                 if (bundle.getString("pushUrl") != null && !bundle.getString("pushUrl")
                         .equals("", ignoreCase = true)
                 ) {
+                    appStartFlag = false
                     pushUrl = bundle.get("pushUrl") as String
                 }
             }
-            mWebView.run {
-                webViewClient = CustomWebViewClient()
-                clearCache(true)
-                loadUrl(pushUrl + "?t=" + System.currentTimeMillis())
+            if(!appStartFlag){
+                mWebView.run {
+                    webViewClient = CustomWebViewClient()
+                    clearCache(true)
+                    loadUrl(pushUrl + "?t=" + System.currentTimeMillis())
+                    appStartFlag = true
+                }
             }
+
         }
     }
     fun View.hideKeyboard() {
@@ -474,7 +479,7 @@ class MainActivity : AppCompatActivity() {
                 authFlag = false
                 goMain()
             }
-            else{
+            else {
                 val companyCd = map?.get("COMPANY_CD")
                 val encPwd = URLDecoder.decode(map?.get("ENC_PWD"),"UTF-8")
 //                val encPwd = map?.get("ENC_PWD")
@@ -563,9 +568,6 @@ class MainActivity : AppCompatActivity() {
                         exitProcess(0)
                     }
                 })
-            }
-            else{
-                goMain()
             }
         }
 
