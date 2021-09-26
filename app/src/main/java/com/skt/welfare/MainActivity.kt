@@ -111,14 +111,15 @@ class MainActivity : AppCompatActivity() {
         context = this
         Log.d(TAG, "onCreate")
 
-        if(BuildConfig.FLAVOR == "dev"){
-            WebView.setWebContentsDebuggingEnabled(true)
-        }
         var storePackagename = if(isTablet(context)) Constants.toktokStoreTabletPackageName else Constants.toktokStorePhonePackageName
         var toktokPackagename = if(isTablet(context)) Constants.toktokTabletPackageName else Constants.toktokPhonePackageName
         val i = Intent(Intent.ACTION_VIEW)
         var storeUrl = Constants.storePrdUrl
-        if(BuildConfig.FLAVOR == "dev"){
+        if(BuildConfig.FLAVOR == "qa"){
+           qaFlag = true
+        }
+        if(BuildConfig.FLAVOR == "dev" || BuildConfig.FLAVOR == "qa"){
+            WebView.setWebContentsDebuggingEnabled(true)
             storeUrl = Constants.storeDevUrl
         }
         i.data = Uri.parse(storeUrl)
@@ -342,7 +343,7 @@ class MainActivity : AppCompatActivity() {
         }
         else{
             Constants.frontUrl = Constants.frontPrdUrl
-            if(BuildConfig.FLAVOR == "dev"){
+            if(BuildConfig.FLAVOR == "dev" || BuildConfig.FLAVOR == "qa"){
                 Constants.frontUrl = Constants.frontDevUrl
             }
             else if(BuildConfig.FLAVOR == "stg") {
@@ -540,7 +541,7 @@ class MainActivity : AppCompatActivity() {
                                     val intent = Intent(Intent.ACTION_VIEW)
 
                                     var storeUrl = Constants.storePrdUrl
-                                    if(BuildConfig.FLAVOR == "dev"){
+                                    if(BuildConfig.FLAVOR == "dev" || BuildConfig.FLAVOR == "qa"){
                                         storeUrl = Constants.storeDevUrl
                                     }
                                     intent.data = Uri.parse(storeUrl)

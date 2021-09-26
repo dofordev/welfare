@@ -52,7 +52,7 @@ interface BackendApi {
                 .build()
 
             var backendUrl = Constants.backendPrdUrl
-            if(BuildConfig.FLAVOR == "dev"){
+            if(BuildConfig.FLAVOR == "dev" || BuildConfig.FLAVOR == "qa"){
                 backendUrl = Constants.backendDevUrl
             }
             else if(BuildConfig.FLAVOR == "stg"){

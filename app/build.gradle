@@ -55,6 +55,10 @@ android {
     }
     flavorDimensions "version"
     productFlavors {
+        qa {
+            dimension "version"
+            versionNameSuffix "-qa"
+        }
         dev {
             dimension "version"
             versionNameSuffix "-dev"

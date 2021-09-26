@@ -50,7 +50,7 @@ class FireBaseMessagingService : FirebaseMessagingService() {
         intent.setClass(this, MainActivity::class.java)
 
         Constants.frontUrl = Constants.frontPrdUrl
-        if(BuildConfig.FLAVOR == "dev"){
+        if(BuildConfig.FLAVOR == "dev" || BuildConfig.FLAVOR == "qa"){
             Constants.frontUrl = Constants.frontDevUrl
         }
         else if(BuildConfig.FLAVOR == "stg") {
