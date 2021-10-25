@@ -1,7 +1,7 @@
 ## 앱 브릿지 정의
 
 > [App to Web]
-+ 뒤로가기 스크립트
++ 뒤로가기 스크립트 호출
    + backKey() 호출
 
 > [Web to App]
@@ -15,9 +15,16 @@
 + 텍스트복사 브릿지 함수
    + clipboardCopy(msg)
      - msg : 복사할 메시지
-+ 유심 핸드폰번호 얻기 
-   + getPhoneNumber(callbackFnName) 
-     - callbackFnName : 콜백함수명 : 콜백함수(핸드폰번호) 로 리턴, 유심없을시 빈값
++ 유심 핸드폰 가져오기 브릿지 함수
+   + getPhoneNumber(callbackFnName)
+     - callbackFnName : 리턴으로 실행될 함수명 - 인자로 핸드폰번호 넘김
++ OCR 촬영 브릿지 함수
+   + callOcrCamera(callbackFnName, token)
+     - callbackFnName : 리턴으로 실행될 함수명 - 인자로 서버응답 json 넘김
+     - token : 앱 -> 백엔드 통신시 헤더에 세팅할 토큰값
++ 톡톡로그인 정보 가져오기 브릿지 함수
+   + get(callbackFnName)
+     - callbackFnName : 리턴으로 실행될 함수명 - 인자로 로그인응답 json 넘김
 ---
 ## javascript 작성 예시
 > ### Android

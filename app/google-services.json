@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "511234443881",
+    "project_id": "welfare-f5349",
+    "storage_bucket": "welfare-f5349.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511234443881:android:f5727386883ea08bbe70f8",
+        "android_client_info": {
+          "package_name": "com.skt.welfare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "511234443881-vtqln913ehmq5ntve8pqau0gd4hi25ja.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBASEkrmfEBMx9V4Qm7h5NyvmQrWNYKkEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "511234443881-vtqln913ehmq5ntve8pqau0gd4hi25ja.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "511234443881-lufaltjcshenkkfdjgtovshm4a3vqfho.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gmp.skt.welfare"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
