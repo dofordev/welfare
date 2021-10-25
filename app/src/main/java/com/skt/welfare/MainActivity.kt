@@ -351,7 +351,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             var pushUrl = Constants.frontUrl
-            val intent = intent
             val bundle = intent.extras
             if (bundle != null) {
                 if (bundle.getString("pushUrl") != null && !bundle.getString("pushUrl")
@@ -359,6 +358,7 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     appStartFlag = false
                     pushUrl = bundle.get("pushUrl") as String
+                    intent.extras?.clear()
                 }
             }
             if(!appStartFlag){
