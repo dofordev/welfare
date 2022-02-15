@@ -73,7 +73,9 @@ object Constants {
 
     var token = ""
 
-    var loginInfo: TokTokResponse? = null
+    var loginInfo: TokTokResponse? = TokTokResponse(
+        deviceToken = ""
+    )
 
     var tmaptapi: TMapTapi? = null
 
