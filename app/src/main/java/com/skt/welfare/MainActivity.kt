@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         NotificationHub.setListener(AzureNotificationListener());
-        NotificationHub.start(this.application, "Connection-String", "Hub Name");
+        NotificationHub.start(this.application, "notihubns-skt-pc-welfare-dev", "Endpoint=sb://notihubns-skt-pc-welfare-dev.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=OocMO6nVI4CaQNBLUpMzlnfol/4l81ZzNXti6zyyD+U=");
 
 
         context = this
