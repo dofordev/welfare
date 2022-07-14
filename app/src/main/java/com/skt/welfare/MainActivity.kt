@@ -55,7 +55,7 @@ import kotlin.system.exitProcess
 import android.os.Bundle
 
 import android.content.Intent
-import com.microsoft.windowsazure.messaging.notificationhubs.NotificationHub
+//import com.microsoft.windowsazure.messaging.notificationhubs.NotificationHub
 
 
 var splashView: View? = null
@@ -106,8 +106,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        NotificationHub.setListener(AzureNotificationListener());
-        NotificationHub.start(this.application, "Connection-String", "Hub Name");
+//        NotificationHub.setListener(AzureNotificationListener());
+//        NotificationHub.start(this.application, "Connection-String", "Hub Name");
 
 
         context = this

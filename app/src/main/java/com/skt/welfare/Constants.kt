@@ -22,15 +22,17 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object Constants {
-    val frontDevUrl = "http://welfaredevm.sktelecom.com:50000"
+    val frontDevUrl = "https://welfaredevm.sktelecom.com:50000"
     val frontPrdUrl = "https://welfarem.sktelecom.com:50443"
-    val frontStgUrl = "http://welfaredevm.sktelecom.com:50000"
+    val frontStgUrl = "https://welfaredevm.sktelecom.com:50000"
 
     var frontUrl = ""
 
     val backendDevUrl = "http://welfaredevm.sktelecom.com:50001"
+//    val backendDevUrl = "https://welfarem.sktelecom.com:58443"
     val backendPrdUrl = "https://welfarem.sktelecom.com:58443"
     val backendStgUrl = "http://welfaredevm.sktelecom.com:50001"
+//    val backendStgUrl = "https://welfarem.sktelecom.com:58443"
 
     val appCloseWaitText = "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다."
     val appCloseText = "앱이 종료됩니다."
